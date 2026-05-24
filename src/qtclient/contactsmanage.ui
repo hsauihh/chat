@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ContactsManageWidget</class>
+ <widget class="QWidget" name="ContactsManageWidget">
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QLabel" name="titleLabel">
+     <property name="text">
+      <string>联系人管理</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 18px; font-weight: bold; padding: 8px;</string>
+     </property>
+    </widget>
+   </item>
+   <!-- 添加好友 -->
+   <item>
+    <widget class="QGroupBox" name="friendGroup">
+     <property name="title">
+      <string>添加好友</string>
+     </property>
+     <layout class="QHBoxLayout" name="friendLayout">
+      <item>
+       <widget class="QLineEdit" name="addFriendEdit">
+        <property name="placeholderText">
+         <string>输入好友 ID</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addFriendBtn">
+        <property name="text">
+         <string>添加</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #07c160; color: white; padding: 6px 16px; border-radius: 4px;</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <!-- 创建群组 -->
+   <item>
+    <widget class="QGroupBox" name="createGroupBox">
+     <property name="title">
+      <string>创建群组</string>
+     </property>
+     <layout class="QVBoxLayout" name="createGroupLayout">
+      <item>
+       <widget class="QLineEdit" name="createGroupNameEdit">
+        <property name="placeholderText">
+         <string>群组名称</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="createGroupDescEdit">
+        <property name="placeholderText">
+         <string>群组描述</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="createGroupBtn">
+        <property name="text">
+         <string>创建群组</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #07c160; color: white; padding: 6px 16px; border-radius: 4px;</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <!-- 加入群组 -->
+   <item>
+    <widget class="QGroupBox" name="joinGroupBox">
+     <property name="title">
+      <string>加入群组</string>
+     </property>
+     <layout class="QHBoxLayout" name="joinGroupLayout">
+      <item>
+       <widget class="QLineEdit" name="addGroupEdit">
+        <property name="placeholderText">
+         <string>输入群组 ID</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addGroupBtn">
+        <property name="text">
+         <string>加入</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #07c160; color: white; padding: 6px 16px; border-radius: 4px;</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="bottomSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

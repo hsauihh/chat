@@ -1,0 +1,134 @@
+[
+{
+  "directory": "/home/woshi/chat/chat/build/src/server",
+  "command": "/usr/bin/g++  -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty  -g -g -o CMakeFiles/ChatServer.dir/chatserver.cpp.o -c /home/woshi/chat/chat/src/server/chatserver.cpp",
+  "file": "/home/woshi/chat/chat/src/server/chatserver.cpp",
+  "output": "src/server/CMakeFiles/ChatServer.dir/chatserver.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/server",
+  "command": "/usr/bin/g++  -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty  -g -g -o CMakeFiles/ChatServer.dir/chatservice.cpp.o -c /home/woshi/chat/chat/src/server/chatservice.cpp",
+  "file": "/home/woshi/chat/chat/src/server/chatservice.cpp",
+  "output": "src/server/CMakeFiles/ChatServer.dir/chatservice.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/server",
+  "command": "/usr/bin/g++  -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty  -g -g -o CMakeFiles/ChatServer.dir/main.cpp.o -c /home/woshi/chat/chat/src/server/main.cpp",
+  "file": "/home/woshi/chat/chat/src/server/main.cpp",
+  "output": "src/server/CMakeFiles/ChatServer.dir/main.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/server",
+  "command": "/usr/bin/g++  -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty  -g -g -o CMakeFiles/ChatServer.dir/db/db.cpp.o -c /home/woshi/chat/chat/src/server/db/db.cpp",
+  "file": "/home/woshi/chat/chat/src/server/db/db.cpp",
+  "output": "src/server/CMakeFiles/ChatServer.dir/db/db.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/server",
+  "command": "/usr/bin/g++  -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty  -g -g -o CMakeFiles/ChatServer.dir/model/friendmodel.cpp.o -c /home/woshi/chat/chat/src/server/model/friendmodel.cpp",
+  "file": "/home/woshi/chat/chat/src/server/model/friendmodel.cpp",
+  "output": "src/server/CMakeFiles/ChatServer.dir/model/friendmodel.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/server",
+  "command": "/usr/bin/g++  -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty  -g -g -o CMakeFiles/ChatServer.dir/model/groupmodel.cpp.o -c /home/woshi/chat/chat/src/server/model/groupmodel.cpp",
+  "file": "/home/woshi/chat/chat/src/server/model/groupmodel.cpp",
+  "output": "src/server/CMakeFiles/ChatServer.dir/model/groupmodel.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/server",
+  "command": "/usr/bin/g++  -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty  -g -g -o CMakeFiles/ChatServer.dir/model/offlinemessagemodel.cpp.o -c /home/woshi/chat/chat/src/server/model/offlinemessagemodel.cpp",
+  "file": "/home/woshi/chat/chat/src/server/model/offlinemessagemodel.cpp",
+  "output": "src/server/CMakeFiles/ChatServer.dir/model/offlinemessagemodel.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/server",
+  "command": "/usr/bin/g++  -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty  -g -g -o CMakeFiles/ChatServer.dir/model/usermodel.cpp.o -c /home/woshi/chat/chat/src/server/model/usermodel.cpp",
+  "file": "/home/woshi/chat/chat/src/server/model/usermodel.cpp",
+  "output": "src/server/CMakeFiles/ChatServer.dir/model/usermodel.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/server",
+  "command": "/usr/bin/g++  -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty  -g -g -o CMakeFiles/ChatServer.dir/redis/redis.cpp.o -c /home/woshi/chat/chat/src/server/redis/redis.cpp",
+  "file": "/home/woshi/chat/chat/src/server/redis/redis.cpp",
+  "output": "src/server/CMakeFiles/ChatServer.dir/redis/redis.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/client",
+  "command": "/usr/bin/g++  -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty  -g -g -o CMakeFiles/ChatClient.dir/main.cpp.o -c /home/woshi/chat/chat/src/client/main.cpp",
+  "file": "/home/woshi/chat/chat/src/client/main.cpp",
+  "output": "src/client/CMakeFiles/ChatClient.dir/main.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/qtclient",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -I/home/woshi/chat/chat/build/src/qtclient/QtChatClient_autogen/include -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork  -g -g -finput-charset=UTF-8 -fexec-charset=UTF-8 -o CMakeFiles/QtChatClient.dir/QtChatClient_autogen/mocs_compilation.cpp.o -c /home/woshi/chat/chat/build/src/qtclient/QtChatClient_autogen/mocs_compilation.cpp",
+  "file": "/home/woshi/chat/chat/build/src/qtclient/QtChatClient_autogen/mocs_compilation.cpp",
+  "output": "src/qtclient/CMakeFiles/QtChatClient.dir/QtChatClient_autogen/mocs_compilation.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/qtclient",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -I/home/woshi/chat/chat/build/src/qtclient/QtChatClient_autogen/include -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork  -g -g -finput-charset=UTF-8 -fexec-charset=UTF-8 -o CMakeFiles/QtChatClient.dir/chatclient.cpp.o -c /home/woshi/chat/chat/src/qtclient/chatclient.cpp",
+  "file": "/home/woshi/chat/chat/src/qtclient/chatclient.cpp",
+  "output": "src/qtclient/CMakeFiles/QtChatClient.dir/chatclient.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/qtclient",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -I/home/woshi/chat/chat/build/src/qtclient/QtChatClient_autogen/include -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork  -g -g -finput-charset=UTF-8 -fexec-charset=UTF-8 -o CMakeFiles/QtChatClient.dir/chatwidget.cpp.o -c /home/woshi/chat/chat/src/qtclient/chatwidget.cpp",
+  "file": "/home/woshi/chat/chat/src/qtclient/chatwidget.cpp",
+  "output": "src/qtclient/CMakeFiles/QtChatClient.dir/chatwidget.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/qtclient",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -I/home/woshi/chat/chat/build/src/qtclient/QtChatClient_autogen/include -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork  -g -g -finput-charset=UTF-8 -fexec-charset=UTF-8 -o CMakeFiles/QtChatClient.dir/contactsmanagewidget.cpp.o -c /home/woshi/chat/chat/src/qtclient/contactsmanagewidget.cpp",
+  "file": "/home/woshi/chat/chat/src/qtclient/contactsmanagewidget.cpp",
+  "output": "src/qtclient/CMakeFiles/QtChatClient.dir/contactsmanagewidget.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/qtclient",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -I/home/woshi/chat/chat/build/src/qtclient/QtChatClient_autogen/include -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork  -g -g -finput-charset=UTF-8 -fexec-charset=UTF-8 -o CMakeFiles/QtChatClient.dir/contactwidget.cpp.o -c /home/woshi/chat/chat/src/qtclient/contactwidget.cpp",
+  "file": "/home/woshi/chat/chat/src/qtclient/contactwidget.cpp",
+  "output": "src/qtclient/CMakeFiles/QtChatClient.dir/contactwidget.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/qtclient",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -I/home/woshi/chat/chat/build/src/qtclient/QtChatClient_autogen/include -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork  -g -g -finput-charset=UTF-8 -fexec-charset=UTF-8 -o CMakeFiles/QtChatClient.dir/creategroupwidget.cpp.o -c /home/woshi/chat/chat/src/qtclient/creategroupwidget.cpp",
+  "file": "/home/woshi/chat/chat/src/qtclient/creategroupwidget.cpp",
+  "output": "src/qtclient/CMakeFiles/QtChatClient.dir/creategroupwidget.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/qtclient",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -I/home/woshi/chat/chat/build/src/qtclient/QtChatClient_autogen/include -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork  -g -g -finput-charset=UTF-8 -fexec-charset=UTF-8 -o CMakeFiles/QtChatClient.dir/infowidget.cpp.o -c /home/woshi/chat/chat/src/qtclient/infowidget.cpp",
+  "file": "/home/woshi/chat/chat/src/qtclient/infowidget.cpp",
+  "output": "src/qtclient/CMakeFiles/QtChatClient.dir/infowidget.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/qtclient",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -I/home/woshi/chat/chat/build/src/qtclient/QtChatClient_autogen/include -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork  -g -g -finput-charset=UTF-8 -fexec-charset=UTF-8 -o CMakeFiles/QtChatClient.dir/loginwidget.cpp.o -c /home/woshi/chat/chat/src/qtclient/loginwidget.cpp",
+  "file": "/home/woshi/chat/chat/src/qtclient/loginwidget.cpp",
+  "output": "src/qtclient/CMakeFiles/QtChatClient.dir/loginwidget.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/qtclient",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -I/home/woshi/chat/chat/build/src/qtclient/QtChatClient_autogen/include -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork  -g -g -finput-charset=UTF-8 -fexec-charset=UTF-8 -o CMakeFiles/QtChatClient.dir/main.cpp.o -c /home/woshi/chat/chat/src/qtclient/main.cpp",
+  "file": "/home/woshi/chat/chat/src/qtclient/main.cpp",
+  "output": "src/qtclient/CMakeFiles/QtChatClient.dir/main.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/qtclient",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -I/home/woshi/chat/chat/build/src/qtclient/QtChatClient_autogen/include -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork  -g -g -finput-charset=UTF-8 -fexec-charset=UTF-8 -o CMakeFiles/QtChatClient.dir/mainwidget.cpp.o -c /home/woshi/chat/chat/src/qtclient/mainwidget.cpp",
+  "file": "/home/woshi/chat/chat/src/qtclient/mainwidget.cpp",
+  "output": "src/qtclient/CMakeFiles/QtChatClient.dir/mainwidget.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/qtclient",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -I/home/woshi/chat/chat/build/src/qtclient/QtChatClient_autogen/include -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork  -g -g -finput-charset=UTF-8 -fexec-charset=UTF-8 -o CMakeFiles/QtChatClient.dir/messagebubble.cpp.o -c /home/woshi/chat/chat/src/qtclient/messagebubble.cpp",
+  "file": "/home/woshi/chat/chat/src/qtclient/messagebubble.cpp",
+  "output": "src/qtclient/CMakeFiles/QtChatClient.dir/messagebubble.cpp.o"
+},
+{
+  "directory": "/home/woshi/chat/chat/build/src/qtclient",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -I/home/woshi/chat/chat/build/src/qtclient/QtChatClient_autogen/include -I/home/woshi/chat/chat/include -I/home/woshi/chat/chat/include/server -I/home/woshi/chat/chat/include/server/db -I/home/woshi/chat/chat/include/server/model -I/home/woshi/chat/chat/include/server/redis -I/home/woshi/chat/chat/include/qtclient -I/home/woshi/chat/chat/thirdparty -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork  -g -g -finput-charset=UTF-8 -fexec-charset=UTF-8 -o CMakeFiles/QtChatClient.dir/sidebarwidget.cpp.o -c /home/woshi/chat/chat/src/qtclient/sidebarwidget.cpp",
+  "file": "/home/woshi/chat/chat/src/qtclient/sidebarwidget.cpp",
+  "output": "src/qtclient/CMakeFiles/QtChatClient.dir/sidebarwidget.cpp.o"
+}
+]

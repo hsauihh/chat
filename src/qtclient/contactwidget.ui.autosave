@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ContactWidget</class>
+ <widget class="QWidget" name="ContactWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>296</width>
+    <height>280</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="friendTab">
+      <attribute name="title">
+       <string>好友</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="friendLayout">
+       <item>
+        <widget class="QLabel" name="friendCountLabel">
+         <property name="text">
+          <string>好友列表 (0人)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="friendList">
+         <property name="styleSheet">
+          <string notr="true">QListWidget::item { padding: 8px; }</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="groupTab">
+      <attribute name="title">
+       <string>群组</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="groupLayout">
+       <item>
+        <widget class="QLabel" name="groupCountLabel">
+         <property name="text">
+          <string>群组列表 (0个)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="groupList">
+         <property name="styleSheet">
+          <string notr="true">QListWidget::item { padding: 8px; }</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

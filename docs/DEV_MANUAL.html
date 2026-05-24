@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat 客户端开发手册 — 老奶奶都能看懂</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --muted: #64748b;
+    --code-bg: #f1f5f9;
+    --warning: #f59e0b;
+    --success: #10b981;
+    --danger: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    color: var(--text); background: var(--bg);
+    line-height: 1.8; padding: 20px;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 2.2em; margin: 40px 0 10px; padding-bottom: 10px; border-bottom: 3px solid var(--primary); }
+  h2 { font-size: 1.6em; margin: 50px 0 15px; color: var(--primary); }
+  h3 { font-size: 1.2em; margin: 30px 0 10px; }
+  h4 { font-size: 1.0em; margin: 20px 0 10px; color: var(--muted); }
+  p { margin: 10px 0; }
+
+  /* 卡片 */
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 20px; margin: 16px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  /* 提示框 */
+  .tip, .warn, .danger {
+    border-left: 4px solid; padding: 12px 16px; margin: 16px 0; border-radius: 0 8px 8px 0;
+  }
+  .tip  { background: #eff6ff; border-color: var(--primary); }
+  .warn { background: #fffbeb; border-color: var(--warning); }
+  .danger { background: #fef2f2; border-color: var(--danger); }
+  .tip::before { content: "💡 提示："; font-weight: bold; }
+  .warn::before { content: "⚠️ 注意："; font-weight: bold; }
+  .danger::before { content: "🚫 警告："; font-weight: bold; }
+
+  /* 代码 */
+  code {
+    background: var(--code-bg); padding: 2px 6px; border-radius: 3px;
+    font-family: "Cascadia Code", "Fira Code", "JetBrains Mono", monospace;
+    font-size: 0.9em;
+  }
+  pre {
+    background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 8px;
+    overflow-x: auto; margin: 12px 0; line-height: 1.6;
+  }
+  pre code {
+    background: none; padding: 0; color: inherit;
+  }
+  /* 语法高亮 */
+  .kw { color: #c792ea; }  .str { color: #c3e88d; }
+  .cmt { color: #546e7a; font-style: italic; } .fn { color: #82aaff; }
+
+  /* 目录 */
+  nav.toc {
+    background: var(--card); border: 2px solid var(--primary); border-radius: 12px;
+    padding: 24px; margin: 20px 0;
+  }
+  nav.toc h2 { margin: 0 0 12px; padding: 0; border: none; }
+  nav.toc a { color: var(--primary); text-decoration: none; display: inline; }
+
+  /* 表格 */
+  table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid var(--border); padding: 10px 14px; text-align: left; }
+  th { background: #f1f5f9; font-weight: 600; }
+
+  /* 步骤编号 */
+  .step-list { counter-reset: step; list-style: none; padding: 0; }
+  .step-list li { counter-increment: step; margin: 18px 0; padding: 12px 16px 12px 60px; position: relative; background: var(--card); border-radius: 8px; border: 1px solid var(--border); }
+  .step-list li::before { content: counter(step); position: absolute; left: 12px; top: 10px; width: 32px; height: 32px; background: var(--primary); color: #fff; border-radius: 50%; text-align: center; line-height: 32px; font-weight: bold; font-size: 0.9em; }
+
+  /* FAQ */
+  details { margin: 12px 0; }
+  details summary { cursor: pointer; font-weight: bold; padding: 8px 0; color: var(--primary); }
+  details .answer { padding-left: 16px; border-left: 2px solid var(--border); margin: 8px 0; }
+
+  @media print { body { font-size: 12px; } .tip, .warn, .danger { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Chat 客户端开发手册</h1>
+<p style="color:var(--muted); font-size:1.1em;">
+  版本 2.0 · 2026 年 5 月 · 目标读者：有 C++ 基础、零 Qt 经验的开发者
+</p>
+
+<div class="tip">阅读本手册前，确保你已读过仓库根目录的 <code>CLAUDE.md</code>，了解项目整体架构。</div>
+
+<!-- ================================================================== -->
+<nav class="toc">
+<h2>📖 目录</h2>
+<ol style="padding-left:20px;">
+  <li><a href="#s1">项目地图：每个文件是干什么的</a></li>
+  <li><a href="#s2">Qt 速成课：10 分钟掌握你需要知道的 Qt</a></li>
+  <li><a href="#s3">架构详解：数据如何流动</a></li>
+  <li><a href="#s4">组件详解：每个类、每个函数</a></li>
+  <li><a href="#s5">UI 文件（.ui）的结构与编辑方法</a></li>
+  <li><a href="#s6">如何添加新功能（5 个实战案例）</a></li>
+  <li><a href="#s7">构建与调试</a></li>
+  <li><a href="#s8">常见问题排查 (FAQ)</a></li>
+  <li><a href="#s9">键盘快捷键速查</a></li>
+</ol>
+</nav>
+
+<!-- ================================================================== -->
+<h1 id="s1">1. 项目地图：每个文件是干什么的</h1>
+
+<p>我们只关注 <code>src/qtclient/</code> 和 <code>include/qtclient/</code> 这两个目录。下面是每个文件的用途：</p>
+
+<h3>入口 &amp; 网络层</h3>
+<div class="card">
+<table>
+<tr><th>文件</th><th>角色</th><th>代码量</th></tr>
+<tr>
+  <td><code>src/qtclient/main.cpp</code></td>
+  <td><b>程序入口</b>。创建 QApplication → 创建 MainWidget → 连接服务器 → 启动事件循环。</td>
+  <td>40 行</td>
+</tr>
+<tr>
+  <td><code>include/qtclient/chatclient.hpp</code><br><code>src/qtclient/chatclient.cpp</code></td>
+  <td><b>TCP 网络客户端</b>。封装 QTcpSocket，负责收发 JSON 消息（以 <code>\0</code> 分隔）。你不知道它存在也没关系——MainWidget 帮你管好了。</td>
+  <td>50 / 120 行</td>
+</tr>
+</table>
+</div>
+
+<h3>控制器 &amp; 页面</h3>
+<div class="card">
+<table>
+<tr><th>文件</th><th>角色</th><th>代码量</th></tr>
+<tr>
+  <td><code>include/qtclient/mainwidget.hpp</code><br><code>src/qtclient/mainwidget.cpp</code></td>
+  <td><b>主控制器（大脑）</b>。管理页面切换、连接信号槽、处理服务端消息分发。</td>
+  <td>86 / 395 行</td>
+</tr>
+<tr>
+  <td><code>include/qtclient/loginwidget.hpp</code><br><code>src/qtclient/loginwidget.cpp</code></td>
+  <td><b>登录/注册页面</b>。收集用户输入 → emit 信号。最纯粹的表单组件。</td>
+  <td>36 / 64 行</td>
+</tr>
+</table>
+</div>
+
+<h3>主页面子组件</h3>
+<div class="card">
+<table>
+<tr><th>文件</th><th>角色</th><th>代码量</th></tr>
+<tr>
+  <td><code>include/qtclient/sidebarwidget.hpp</code><br><code>src/qtclient/sidebarwidget.cpp</code></td>
+  <td><b>左侧导航栏（60px）</b>。头像、导航按钮（聊天/联系人）、退出登录、清理记录。所有按钮只 emit 信号，不执行实际操作。</td>
+  <td>33 / 89 行</td>
+</tr>
+<tr>
+  <td><code>include/qtclient/contactwidget.hpp</code><br><code>src/qtclient/contactwidget.cpp</code></td>
+  <td><b>联系人列表</b>。显示好友和群组，支持搜索过滤、红点未读标记，双击打开聊天。</td>
+  <td>50 / 154 行</td>
+</tr>
+<tr>
+  <td><code>include/qtclient/chatwidget.hpp</code><br><code>src/qtclient/chatwidget.cpp</code></td>
+  <td><b>聊天区域（最大最复杂的组件）</b>。消息气泡渲染、消息输入、聊天对象切换、本地持久化存储。</td>
+  <td>70 / 327 行</td>
+</tr>
+<tr>
+  <td><code>include/qtclient/messagebubble.hpp</code><br><code>src/qtclient/messagebubble.cpp</code></td>
+  <td><b>单条消息气泡</b>。绿色靠右（自己）、白色靠左（对方）。<b>修改消息外观就改这里。</b></td>
+  <td>26 / 44 行</td>
+</tr>
+<tr>
+  <td><code>include/qtclient/contactsmanagewidget.hpp</code><br><code>src/qtclient/contactsmanagewidget.cpp</code></td>
+  <td><b>联系人管理页面</b>。添加好友、创建/加入群组的表单。点侧边栏"联系人"按钮切到此页。</td>
+  <td>34 / 47 行</td>
+</tr>
+<tr>
+  <td><code>include/qtclient/creategroupwidget.hpp</code><br><code>src/qtclient/creategroupwidget.cpp</code></td>
+  <td><b>创建/加入群组对话框（独立组件，当前未使用）</b>。QDialog 模式参考。</td>
+  <td>41 / 77 行</td>
+</tr>
+</table>
+</div>
+
+<h3>UI 文件</h3>
+<div class="card">
+<table>
+<tr><th>文件</th><th>对应的 C++ 类</th><th>内容</th></tr>
+<tr><td><code>src/qtclient/chatwidget.ui</code></td><td>ChatWidget</td><td>顶部栏 + QListWidget（消息列表） + 底部 QPlainTextEdit（输入框） + 发送按钮</td></tr>
+<tr><td><code>src/qtclient/sidebar.ui</code></td><td>SidebarWidget</td><td>头像按钮 + 用户信息面板 + 导航按钮 + 清理按钮</td></tr>
+<tr><td><code>src/qtclient/contactwidget.ui</code></td><td>ContactWidget</td><td>搜索框 + 好友 QListWidget + 群组 QListWidget</td></tr>
+<tr><td><code>src/qtclient/loginwidget.ui</code></td><td>LoginWidget</td><td>QStackedWidget（登录页 / 注册页）</td></tr>
+<tr><td><code>src/qtclient/contactsmanage.ui</code></td><td>ContactsManageWidget</td><td>添加好友、创建群组、加入群组的表单</td></tr>
+<tr><td><code>src/qtclient/messagebubble.ui</code></td><td>MessageBubble</td><td>时间标签 + 气泡标签 + 名称标签 + spacer 布局</td></tr>
+<tr><td><code>src/qtclient/creategroupwidget.ui</code></td><td>CreateGroupWidget</td><td>群组创建/加入对话框</td></tr>
+</table>
+</div>
+
+<h3>其他关键文件</h3>
+<div class="card">
+<table>
+<tr><th>文件</th><th>作用</th></tr>
+<tr><td><code>include/public.hpp</code></td><td>定义消息类型枚举 EnMsgType（LOGIN_MSG=1, ONE_CHAT_MSG=5, GROUP_CHAT_MSG=8 等）</td></tr>
+<tr><td><code>include/server/user.hpp</code> / <code>group.hpp</code></td><td>数据模型类（User, Group, GroupUser）</td></tr>
+<tr><td><code>thirdparty/json.hpp</code></td><td>nlohmann/json 单头文件库，处理所有 JSON 序列化</td></tr>
+<tr><td><code>src/qtclient/CMakeLists.txt</code></td><td>构建配置：需要 Qt6::Widgets + Qt6::Network</td></tr>
+</table>
+</div>
+
+<!-- ================================================================== -->
+<h1 id="s2">2. Qt 速成课：10 分钟掌握你需要知道的 Qt</h1>
+
+<h3>2.1 Qt 是什么？</h3>
+<p>Qt 是一个 C++ GUI 框架。它提供：</p>
+<ul style="padding-left:20px;">
+  <li><b>Widget</b>（积木）：按钮 QPushButton、文本框 QLineEdit、列表 QListWidget、标签 QLabel 等——把它们组合起来就是界面</li>
+  <li><b>信号/槽</b>（电线）：Widget A 发生事件 → 通知 Widget B 做某事。类似于回调函数，但类型安全、支持多对多连接</li>
+  <li><b>事件循环</b>（心脏）：QApplication::exec() 启动后，程序不停循环处理鼠标点击、键盘输入、网络数据等事件</li>
+  <li><b>MOC</b>（代码生成器）：扫描头文件中的 Q_OBJECT 宏，自动生成信号/槽的实现代码</li>
+</ul>
+
+<h3>2.2 信号与槽（最重要的一节）</h3>
+<p>把信号和槽想象成"喊话—应答"：</p>
+<div class="card">
+<pre><code><span class="cmt">// 头文件中声明信号和槽</span>
+<span class="kw">class</span> Teacher : <span class="kw">public</span> QObject {
+    Q_OBJECT
+<span class="kw">signals</span>:
+    <span class="kw">void</span> <span class="fn">bellRang</span>();              <span class="cmt">// 信号：不需要写函数体！MOC 自动生成</span>
+};
+<span class="kw">class</span> Student : <span class="kw">public</span> QObject {
+    Q_OBJECT
+<span class="kw">public slots</span>:
+    <span class="kw">void</span> <span class="fn">standUp</span>() { ... }        <span class="cmt">// 槽：就是一个普通的成员函数</span>
+};
+
+<span class="cmt">// 连接：铃声一响，学生就起立</span>
+<span class="fn">connect</span>(teacher, &Teacher::bellRang, student, &Student::standUp);
+
+<span class="cmt">// 触发：铃声响起</span>
+<span class="kw">emit</span> <span class="fn">bellRang</span>();  <span class="cmt">// → Student::standUp() 自动被调用</span>
+</code></pre>
+</div>
+<div class="tip">
+  <b>信号可以有参数，槽也可以有参数。参数从信号传递到槽。</b>
+  <code>connect(slider, &QSlider::valueChanged, label, &QLabel::setNum);</code>
+  — 滑块的值变化时自动更新标签文本。
+</div>
+
+<h3>2.3 Q_OBJECT 宏：别忘了它</h3>
+<p>任何使用了 signals: 或 slots: 的类 <b>必须</b> 在类定义的第一行写 <code>Q_OBJECT</code>。忘记写的话，链接时会报 <code>undefined reference to vtable</code>。</p>
+<p><b>排查方法：</b>看到 vtable 链接错误 → 检查是否写了 Q_OBJECT → 检查头文件是否在 CMakeLists.txt 中被列出 → 重新 cmake 一次。</p>
+
+<h3>2.4 常用 Widget 速查表</h3>
+<div class="card">
+<table>
+<tr><th>你要做什么</th><th>用什么 Widget</th><th>关键方法</th></tr>
+<tr><td>显示一段文字</td><td>QLabel</td><td>setText("文字")</td></tr>
+<tr><td>用户输入一行文字</td><td>QLineEdit</td><td>text() 获取, setPlaceholderText("提示")</td></tr>
+<tr><td>用户输入多行文字</td><td>QPlainTextEdit</td><td>toPlainText() 获取, setPlaceholderText("提示")</td></tr>
+<tr><td>按钮</td><td>QPushButton</td><td>clicked() 信号, setText("按钮"), setIcon(QIcon)</td></tr>
+<tr><td>列表</td><td>QListWidget</td><td>addItem(item), clear(), count(), item(i)</td></tr>
+<tr><td>多页面切换</td><td>QStackedWidget</td><td>addWidget(page), setCurrentIndex(i)</td></tr>
+<tr><td>滚动区域</td><td>QScrollArea</td><td>setWidget(innerWidget)</td></tr>
+<tr><td>对话框</td><td>QDialog</td><td>exec() 模态显示, accept(), reject()</td></tr>
+<tr><td>消息框</td><td>QMessageBox</td><td>information(), warning(), question()</td></tr>
+</table>
+</div>
+
+<h3>2.5 布局（Layout）：让组件自动排列</h3>
+<p>Qt 有四种布局，你只需要三种：</p>
+<div class="card">
+<table>
+<tr><th>布局类</th><th>排列方式</th><th>使用场景</th></tr>
+<tr><td>QVBoxLayout</td><td>垂直排列（上→下）</td><td>侧边栏、聊天消息列表</td></tr>
+<tr><td>QHBoxLayout</td><td>水平排列（左→右）</td><td>消息输入框+发送按钮、联系人列表+聊天区</td></tr>
+<tr><td>QGridLayout</td><td>网格排列</td><td>设置面板、表格数据</td></tr>
+</table>
+</div>
+<pre><code><span class="cmt">// 纯代码创建布局的例子</span>
+<span class="kw">auto</span> *layout = <span class="kw">new</span> QHBoxLayout(<span class="kw">this</span>);
+layout->addWidget(contactList, <span class="str">3</span>);  <span class="cmt">// 占 30% 宽度</span>
+layout->addWidget(chatArea, <span class="str">7</span>);     <span class="cmt">// 占 70% 宽度</span>
+</code></pre>
+
+<h3>2.6 .ui 文件：可视化 UI vs 手写代码</h3>
+<p>本项目的 .ui 文件用 Qt Designer（或 Qt Creator）编辑，保存为 XML 格式。编译时 <b>UIC 编译器</b> 自动把 .ui 编译为 <code>ui_xxx.h</code>，其中生成一个 <code>Ui::XxxWidget</code> 类。</p>
+<div class="card">
+<pre><code><span class="cmt">// 在 C++ 中使用 .ui 文件定义好的 UI</span>
+<span class="fn">Constructor</span>() {
+    ui-><span class="fn">setupUi</span>(<span class="kw">this</span>);         <span class="cmt">// 必须第一行！创建所有子 Widget</span>
+    ui->button-><span class="fn">setText</span>(<span class="str">"确定"</span>); <span class="cmt">// 通过 ui-> 访问 .ui 中定义的 Widget</span>
+}
+</code></pre>
+</div>
+<div class="tip">.ui 文件 vs 手写代码：<b>复杂布局用 .ui 设计更方便</b>（像 WYSIWYG 编辑器），<b>动态创建 Widget 用代码更方便</b>（如消息气泡）。本项目中两者混用。</div>
+
+<h3>2.7 Qt 对象父子树：内存管理</h3>
+<p>Qt 的对象树自动管理内存。当你 <code>new QWidget(parent)</code> 时，parent 析构时会自动 delete 这个子对象。<b>不需要手动 delete！</b>（除了 ui 指针需要 delete ui。）</p>
+
+
+<!-- ================================================================== -->
+<h1 id="s3">3. 架构详解：数据如何流动</h1>
+
+<h3>3.1 页面切换流程</h3>
+<pre style="background:#1e293b; color:#e2e8f0; padding:16px; border-radius:8px;">
+程序启动
+  │
+  ▼
+LoginWidget  ← 初始页面（_pageStack index 0）
+  │  用户输入 ID + 密码 → emit loginRequest
+  ▼
+MainWidget::handleLoginRequest() → 构造 JSON → _client->send()
+  │  服务器返回 LOGIN_MSG_ACK
+  ▼
+MainWidget::handleLoginResponse()
+  │  解析好友列表、群组列表、离线消息
+  ▼
+switchToMainPage() → setupMainPage()（仅首次）
+  │
+  └─→ _mainPage 显示（_pageStack index 1）
+       ├── SidebarWidget（左侧 60px）
+       └── _rightPanel（QStackedWidget）
+            ├── [0] 聊天视图 = ContactWidget + ChatWidget
+            └── [1] 联系人管理 = ContactsManageWidget
+</pre>
+
+<h3>3.2 发送一条消息的完整路径</h3>
+<pre style="background:#1e293b; color:#e2e8f0; padding:16px; border-radius:8px;">
+用户在 inputEdit 中输入文字 → 点击"发送"按钮
+  │
+  ▼ QPushButton::clicked
+ChatWidget::onSendClicked()
+  │  校验输入不为空
+  ├── 1. emit sendOneChat(toId, msg) ──→ MainWidget::handleSendOneChat()
+  │         构造 JSON {"msgid":5,"id":...,"to":...,"msg":"...","time":"..."}
+  │         _client->send(js)  ——→  服务器
+  │         （服务器收到后转发给目标用户）
+  │
+  ├── 2. 本地创建 MessageBubble 气泡并添加到 messageList
+  │         （绿色靠右，inSelf=true）
+  │
+  └── 3. 调用 appendToStore(js) 保存消息到本地
+</pre>
+
+<h3>3.3 接收一条消息的完整路径</h3>
+<pre style="background:#1e293b; color:#e2e8f0; padding:16px; border-radius:8px;">
+服务器 → TCP 字节流 → QTcpSocket::readyRead
+  │
+  ▼
+ChatClient::onReadyRead()
+  │  按 '\0' 分割，解析每条 JSON
+  │  emit messageReceived(js)
+  ▼
+MainWidget::handleMessageReceived(js)
+  │  switch(js["msgid"])
+  ├── ONE_CHAT_MSG → handleOneChatMessage()
+  └── GROUP_CHAT_MSG → handleGroupChatMessage()
+        │
+        ▼
+      ChatWidget::displayMessage(js)
+        │
+        ├── 消息属于当前聊天对象？→ 渲染气泡 + appendToStore
+        └── 不属于？→ storeMessage(js) → 存入文件 + emit unreadMessageStored
+                                        → MainWidget → ContactWidget.setItemUnread(红点)
+</pre>
+
+<h3>3.4 信号连接地图（完整的 wires）</h3>
+<div class="card">
+<table>
+<tr><th>信号来源</th><th>信号</th><th>→</th><th>接收者</th><th>槽</th></tr>
+<tr><td>LoginWidget</td><td>loginRequest(id, pwd)</td><td>→</td><td>MainWidget</td><td>handleLoginRequest()</td></tr>
+<tr><td>LoginWidget</td><td>registerRequest(name, pwd)</td><td>→</td><td>MainWidget</td><td>handleRegisterRequest()</td></tr>
+<tr><td>SidebarWidget</td><td>chatNavClicked()</td><td>→</td><td>MainWidget</td><td>switchToChatView()</td></tr>
+<tr><td>SidebarWidget</td><td>contactsNavClicked()</td><td>→</td><td>MainWidget</td><td>switchToContactsView()</td></tr>
+<tr><td>SidebarWidget</td><td>logoutRequest()</td><td>→</td><td>MainWidget</td><td>handleLogout()</td></tr>
+<tr><td>SidebarWidget</td><td>clearHistoryRequest()</td><td>→</td><td>MainWidget</td><td>handleClearHistory()</td></tr>
+<tr><td>ContactWidget</td><td>chatRequested(uid, name)</td><td>→</td><td>MainWidget</td><td>handleContactChatRequest()</td></tr>
+<tr><td>ContactWidget</td><td>groupChatRequested(gid, name)</td><td>→</td><td>MainWidget</td><td>handleContactGroupChatRequest()</td></tr>
+<tr><td>ChatWidget</td><td>sendOneChat(toId, msg)</td><td>→</td><td>MainWidget</td><td>handleSendOneChat()</td></tr>
+<tr><td>ChatWidget</td><td>sendGroupChat(gid, msg)</td><td>→</td><td>MainWidget</td><td>handleSendGroupChat()</td></tr>
+<tr><td>ChatWidget</td><td>unreadMessageStored(id, isGrp)</td><td>→</td><td>MainWidget λ</td><td>setItemUnread()</td></tr>
+<tr><td>ChatClient</td><td>connected()</td><td>→</td><td>MainWidget</td><td>handleConnected()</td></tr>
+<tr><td>ChatClient</td><td>disconnected()</td><td>→</td><td>MainWidget</td><td>handleDisconnected()</td></tr>
+<tr><td>ChatClient</td><td>messageReceived(js)</td><td>→</td><td>MainWidget</td><td>handleMessageReceived()</td></tr>
+<tr><td>ChatClient</td><td>errorOccurred(err)</td><td>→</td><td>MainWidget λ</td><td>弹出错误对话框</td></tr>
+<tr><td>ContactsManage</td><td>addFriendRequest(id)</td><td>→</td><td>MainWidget</td><td>handleAddFriend()</td></tr>
+<tr><td>ContactsManage</td><td>createGroupRequest(...)</td><td>→</td><td>MainWidget</td><td>handleCreateGroup()</td></tr>
+<tr><td>ContactsManage</td><td>addGroupRequest(id)</td><td>→</td><td>MainWidget</td><td>handleAddGroup()</td></tr>
+</table>
+</div>
+
+
+<!-- ================================================================== -->
+<h1 id="s4">4. 组件详解：每个类、每个函数</h1>
+
+<!-- 4.1 MainWidget -->
+<h2>4.1 MainWidget — 主控制器</h2>
+<div class="card">
+  <p><b>继承</b>：QWidget &nbsp;|&nbsp; <b>角色</b>：Controller（MVC 的 C）</p>
+</div>
+
+<h4>公开方法</h4>
+<table>
+<tr><th>方法</th><th>说明</th></tr>
+<tr><td><code>connectToServer(ip, port)</code></td><td>连接到聊天服务器。在 main() 中调用。</td></tr>
+</table>
+
+<h4>私有槽（由信号触发）</h4>
+<table>
+<tr><th>槽函数</th><th>触发信号</th><th>做的事</th></tr>
+<tr><td><code>handleLoginRequest(id, password)</code></td><td>LoginWidget::loginRequest</td><td>构造 LOGIN_MSG JSON → 发送</td></tr>
+<tr><td><code>handleRegisterRequest(name, password)</code></td><td>LoginWidget::registerRequest</td><td>构造 REG_MSG JSON → 发送</td></tr>
+<tr><td><code>handleMessageReceived(js)</code></td><td>ChatClient::messageReceived</td><td><b>消息分发中心</b>。根据 msgid 调用不同 handler</td></tr>
+<tr><td><code>handleConnected()</code></td><td>ChatClient::connected</td><td>打印连接成功日志</td></tr>
+<tr><td><code>handleDisconnected()</code></td><td>ChatClient::disconnected</td><td>弹窗警告"连接断开" → 返回登录页</td></tr>
+<tr><td><code>handleSendOneChat(toId, msg)</code></td><td>ChatWidget::sendOneChat</td><td>构造 ONE_CHAT_MSG JSON → 发送</td></tr>
+<tr><td><code>handleSendGroupChat(groupId, msg)</code></td><td>ChatWidget::sendGroupChat</td><td>构造 GROUP_CHAT_MSG JSON → 发送</td></tr>
+<tr><td><code>handleContactChatRequest(uid, name)</code></td><td>ContactWidget::chatRequested</td><td>设置聊天目标 → 清除红点 → 切换视图</td></tr>
+<tr><td><code>handleContactGroupChatRequest(gid, name)</code></td><td>ContactWidget::groupChatRequested</td><td>同上（群聊版）</td></tr>
+<tr><td><code>handleAddFriend(friendId)</code></td><td>ContactsManageWidget::addFriendRequest</td><td>构造 ADD_FRIEND_MSG JSON → 发送</td></tr>
+<tr><td><code>handleCreateGroup(name, desc)</code></td><td>ContactsManageWidget::createGroupRequest</td><td>构造 CREAT_GROUP_MSG JSON → 发送</td></tr>
+<tr><td><code>handleAddGroup(groupId)</code></td><td>ContactsManageWidget::addGroupRequest</td><td>构造 ADD_GROUP_MSG JSON → 发送</td></tr>
+<tr><td><code>handleLogout()</code></td><td>SidebarWidget::logoutRequest</td><td>发送注销消息 → 清空状态 → 返回登录页</td></tr>
+<tr><td><code>handleClearHistory()</code></td><td>SidebarWidget::clearHistoryRequest</td><td>弹出确认对话框 → 确认后清理聊天记录</td></tr>
+<tr><td><code>switchToChatView()</code></td><td>SidebarWidget::chatNavClicked</td><td>切换右侧面板到聊天视图（index 0）</td></tr>
+<tr><td><code>switchToContactsView()</code></td><td>SidebarWidget::contactsNavClicked</td><td>切换右侧面板到联系人管理（index 1）</td></tr>
+</table>
+
+<h4>私有方法</h4>
+<table>
+<tr><th>方法</th><th>说明</th></tr>
+<tr><td><code>setupLoginPage()</code></td><td>连接 LoginWidget 信号，将登录页加入 _pageStack</td></tr>
+<tr><td><code>setupMainPage()</code></td><td><b>构建整个主页面布局</b>。懒初始化——只在登录成功时调用一次</td></tr>
+<tr><td><code>switchToLoginPage()</code></td><td>切换到登录页</td></tr>
+<tr><td><code>switchToMainPage()</code></td><td>切换到主页面（首次调用时懒初始化）</td></tr>
+<tr><td><code>handleLoginResponse(js)</code></td><td>解析登录响应：好友列表、群组列表、离线消息 → 初始化所有子组件</td></tr>
+<tr><td><code>handleRegisterResponse(js)</code></td><td>解析注册响应：成功 → 显示生成的 user ID</td></tr>
+<tr><td><code>handleOneChatMessage(js)</code></td><td>收到一对一消息 → ChatWidget::displayMessage()</td></tr>
+<tr><td><code>handleGroupChatMessage(js)</code></td><td>收到群聊消息 → ChatWidget::displayMessage()</td></tr>
+</table>
+
+<!-- 4.2 ChatWidget -->
+<h2>4.2 ChatWidget — 聊天区域（最复杂，最重要）</h2>
+<div class="card">
+  <p><b>继承</b>：QWidget &nbsp;|&nbsp; <b>角色</b>：消息显示 + 输入 + 本地持久化</p>
+</div>
+
+<h4>公开方法</h4>
+<table>
+<tr><th>方法</th><th>说明</th></tr>
+<tr><td><code>displayMessage(js)</code></td><td><b>核心方法</b>。收到消息 → 路由判断（属于当前聊天？渲染 : 存储+通知）→ 创建 MessageBubble → 添加到 messageList</td></tr>
+<tr><td><code>storeMessage(js)</code></td><td>不渲染 UI，直接将消息按类型存入对应的 <code>user_xxx.json</code> 或 <code>group_xxx.json</code></td></tr>
+<tr><td><code>clearCurrentChat()</code></td><td>清空 UI、内存存储、磁盘文件（三处清理）。由清理按钮触发。</td></tr>
+<tr><td><code>setChatTarget(id, name, isGroup)</code></td><td><b>切换聊天对象</b>。保存当前→清空UI→加载目标。双击联系人时调用。</td></tr>
+<tr><td><code>getTargetId()</code></td><td>返回当前聊天对象 ID（-1 表示未选择）</td></tr>
+<tr><td><code>isGroupChat()</code></td><td>当前是否是群聊模式</td></tr>
+<tr><td><code>setOnlineStatus(status)</code></td><td>设置顶部栏状态文本（如"在线"/"离线"）</td></tr>
+<tr><td><code>setCurrentUserId(uid)</code></td><td>设置登录用户 ID（用于判断消息气泡颜色）</td></tr>
+</table>
+
+<h4>信号</h4>
+<table>
+<tr><th>信号</th><th>说明</th></tr>
+<tr><td><code>sendOneChat(toId, msg)</code></td><td>用户点击发送按钮（一对一聊天）</td></tr>
+<tr><td><code>sendGroupChat(groupId, msg)</code></td><td>用户点击发送按钮（群聊）</td></tr>
+<tr><td><code>unreadMessageStored(targetId, isGroup)</code></td><td>有消息被存入非当前聊天（用于触发红点通知）</td></tr>
+</table>
+
+<h4>私有方法</h4>
+<table>
+<tr><th>方法</th><th>说明</th></tr>
+<tr><td><code>makeChatKey(id, isGroup)</code></td><td>构造存储键：<code>"user_123"</code> 或 <code>"group_456"</code></td></tr>
+<tr><td><code>saveCurrentMessages()</code></td><td>将当前聊天的消息从内存写入 JSON 文件</td></tr>
+<tr><td><code>loadMessagesForTarget()</code></td><td>从文件加载目标聊天的历史消息 → 创建 MessageBubble → 添加到列表</td></tr>
+<tr><td><code>appendToStore(js)</code></td><td>追加一条消息到内存 map（聊天过程实时追加）</td></tr>
+<tr><td><code>persistToFile(key)</code></td><td>将指定 key 的消息写入磁盘（JSON 格式化，2 空格缩进）</td></tr>
+<tr><td><code>loadFromFile(key)</code></td><td>从磁盘读取指定 key 的消息文件 → 反序列化 → 存入 map</td></tr>
+<tr><td><code>storageDir()</code></td><td>返回存储目录路径（跨平台，使用 QStandardPaths）</td></tr>
+</table>
+
+<h4>关键成员变量</h4>
+<table>
+<tr><th>变量</th><th>类型</th><th>说明</th></tr>
+<tr><td><code>_targetId</code></td><td>int</td><td>当前聊天对象 ID，-1=未选择</td></tr>
+<tr><td><code>_currentUserId</code></td><td>int</td><td>当前登录用户 ID，用于判断 isSelf</td></tr>
+<tr><td><code>_isGroupChat</code></td><td>bool</td><td>当前是否为群聊模式</td></tr>
+<tr><td><code>_messageStore</code></td><td>map&lt;string, vector&lt;json&gt;&gt;</td><td>所有聊天消息的内存缓存，key="user_xxx"</td></tr>
+</table>
+
+<!-- 4.3 SidebarWidget -->
+<h2>4.3 SidebarWidget — 左侧导航栏</h2>
+<div class="warn">这个组件 <b>只发射信号</b>，不执行任何实际操作。这是一个重要的 Qt 设计原则：子组件只管 UI 输入，具体行为由父组件（MainWidget）决定。</div>
+
+<h4>公开方法</h4>
+<table>
+<tr><th>方法</th><th>说明</th></tr>
+<tr><td><code>setUserInfo(userId, userName)</code></td><td>登录成功后设置用户信息面板的显示内容</td></tr>
+</table>
+
+<h4>信号</h4>
+<table>
+<tr><th>信号</th><th>触发按钮</th><th>MainWidget 响应</th></tr>
+<tr><td><code>chatNavClicked()</code></td><td>聊天按钮</td><td>switchToChatView()</td></tr>
+<tr><td><code>contactsNavClicked()</code></td><td>联系人按钮</td><td>switchToContactsView()</td></tr>
+<tr><td><code>logoutRequest()</code></td><td>退出登录按钮</td><td>handleLogout()</td></tr>
+<tr><td><code>clearHistoryRequest()</code></td><td>清理按钮</td><td>handleClearHistory()</td></tr>
+</table>
+
+<!-- 4.4 ContactWidget -->
+<h2>4.4 ContactWidget — 联系人列表</h2>
+<h4>公开方法</h4>
+<table>
+<tr><th>方法</th><th>说明</th></tr>
+<tr><td><code>updateFriendList(friends)</code></td><td>用服务端数据填充好友列表</td></tr>
+<tr><td><code>updateGroupList(groups)</code></td><td>用服务端数据填充群组列表</td></tr>
+<tr><td><code>updateFriendState(userId, state)</code></td><td>更新单个好友的在线/离线状态显示</td></tr>
+<tr><td><code>setItemUnread(id, isGroup, unread)</code></td><td>设置或清除联系人项的未读红点</td></tr>
+</table>
+
+<h4>信号</h4>
+<table>
+<tr><th>信号</th><th>说明</th></tr>
+<tr><td><code>chatRequested(userId, name)</code></td><td>双击好友 → 发起一对一聊天</td></tr>
+<tr><td><code>groupChatRequested(groupId, name)</code></td><td>双击群组 → 发起群聊</td></tr>
+</table>
+
+<!-- 4.5 ChatClient -->
+<h2>4.5 ChatClient — TCP 网络客户端</h2>
+<h4>公开方法</h4>
+<table>
+<tr><th>方法</th><th>说明</th></tr>
+<tr><td><code>connectToServer(ip, port)</code></td><td>发起 TCP 连接（异步，不阻塞）</td></tr>
+<tr><td><code>send(js)</code></td><td>将 JSON 序列化为字符串，写入 socket（末尾加 '\0'）</td></tr>
+<tr><td><code>disconnect()</code></td><td>主动断开连接</td></tr>
+</table>
+
+<h4>信号</h4>
+<table>
+<tr><th>信号</th><th>说明</th></tr>
+<tr><td><code>connected()</code></td><td>TCP 连接建立成功</td></tr>
+<tr><td><code>disconnected()</code></td><td>TCP 连接断开</td></tr>
+<tr><td><code>messageReceived(js)</code></td><td>收到一条完整的 JSON 消息</td></tr>
+<tr><td><code>errorOccurred(error)</code></td><td>连接出错</td></tr>
+</table>
+
+<!-- 4.6 MessageBubble -->
+<h2>4.6 MessageBubble — 消息气泡</h2>
+<h4>构造函数参数</h4>
+<table>
+<tr><th>参数</th><th>说明</th></tr>
+<tr><td><code>senderName</code></td><td>发送者名称（自己的消息传空字符串）</td></tr>
+<tr><td><code>message</code></td><td>消息文本内容</td></tr>
+<tr><td><code>timeStr</code></td><td>时间字符串（格式: "yyyy-MM-dd HH:mm:ss"）</td></tr>
+<tr><td><code>isSelf</code></td><td>true=自己发的（绿色靠右），false=别人发的（白色靠左）</td></tr>
+</table>
+
+<!-- 4.7 其他 -->
+<h2>4.7 其他小组件</h2>
+
+<h4>LoginWidget</h4>
+<table>
+<tr><th>信号</th><th>说明</th></tr>
+<tr><td><code>loginRequest(id, password)</code></td><td>用户点击登录</td></tr>
+<tr><td><code>registerRequest(name, password)</code></td><td>用户点击注册</td></tr>
+</table>
+
+<h4>ContactsManageWidget</h4>
+<table>
+<tr><th>信号</th><th>说明</th></tr>
+<tr><td><code>addFriendRequest(friendId)</code></td><td>点击添加好友</td></tr>
+<tr><td><code>createGroupRequest(name, desc)</code></td><td>点击创建群组</td></tr>
+<tr><td><code>addGroupRequest(groupId)</code></td><td>点击加入群组</td></tr>
+</table>
+
+<h4>CreateGroupWidget（独立 QDialog）</h4>
+<table>
+<tr><th>方法</th><th>说明</th></tr>
+<tr><td><code>setCreateMode()</code></td><td>切换为创建群组模式（显示名称+描述输入）</td></tr>
+<tr><td><code>setJoinMode()</code></td><td>切换为加入群组模式（显示 ID 输入）</td></tr>
+<tr><td><code>getGroupName() / getGroupDesc() / getGroupId()</code></td><td>获取用户输入的值</td></tr>
+</table>
+
+
+<!-- ================================================================== -->
+<h1 id="s5">5. UI 文件（.ui）的结构与编辑方法</h1>
+
+<h3>5.1 什么是 .ui 文件</h3>
+<p>.ui 文件是 XML 格式的 UI 描述文件。你可以用：</p>
+<ul style="padding-left:20px;">
+  <li><b>Qt Creator</b>：打开 .ui 文件 → 可视化拖拽编辑</li>
+  <li><b>Qt Designer</b>：独立的设计工具</li>
+  <li><b>文本编辑器</b>：直接编辑 XML（适合简单改动，如修改按钮文本）</li>
+</ul>
+
+<h3>5.2 .ui 文件 ↔ C++ 的对应关系</h3>
+<div class="card">
+<p>编译时，<b>UIC</b> (UI Compiler) 将 <code>chatwidget.ui</code> 编译为 <code>ui_chatwidget.h</code>：</p>
+<pre><code><span class="cmt">// chatwidget.ui 中定义:</span>
+<span class="str">&lt;widget class="QPushButton" name="sendBtn"&gt;</span>
+  <span class="str">&lt;property name="text"&gt;</span>
+    <span class="str">&lt;string&gt;发送&lt;/string&gt;</span>
+
+<span class="cmt">// 在 C++ 中访问:</span>
+ui-&gt;sendBtn-&gt;<span class="fn">setText</span>(<span class="str">"发送中..."</span>);
+<span class="fn">connect</span>(ui-&gt;sendBtn, &amp;QPushButton::clicked, ...);
+</code></pre>
+</div>
+
+<h3>5.3 如何修改 .ui 文件</h3>
+<ol class="step-list">
+  <li><b>在 Qt Creator 中打开</b>：双击 .ui 文件 → 进入设计模式</li>
+  <li><b>拖拽 Widget</b>：从左侧工具箱拖拽按钮、文本框等到画布上</li>
+  <li><b>修改属性</b>：在右下角属性面板修改 objectName（代码中的名字）、text、size 等</li>
+  <li><b>设置布局</b>：选中多个 Widget → 右键 → 布局 → 水平/垂直</li>
+  <li><b>保存</b>：Ctrl+S → 重新 cmake → 重新编译</li>
+</ol>
+<h4>如果不想装 Qt Creator：</h4>
+<p>直接编辑 XML 也可以。关键在于 <code>name</code> 属性（对应 C++ 中 <code>ui->name</code>）：</p>
+<pre><code>&lt;widget class="QPushButton" <b>name="myButton"</b>&gt;
+  &lt;property name="text"&gt;
+    <b>&lt;string&gt;我的按钮&lt;/string&gt;</b>
+  &lt;/property&gt;
+&lt;/widget&gt;
+</code></pre>
+
+
+<!-- ================================================================== -->
+<h1 id="s6">6. 如何添加新功能（5 个实战案例）</h1>
+
+<div class="warn">添加任何新功能前，先在纸上画出：信号从哪里来 → 经过谁 → 最终到哪里去。这个思维习惯能避免 90% 的 Qt bug。</div>
+
+<!-- 案例1 -->
+<h2>案例 1：在聊天界面添加表情面板</h2>
+<h3>目标：点 😊 按钮 → 弹出表情选择面板 → 点击表情 → 插入到输入框</h3>
+
+<ol class="step-list">
+  <li>
+    <b>在 chatwidget.ui 中添加表情面板</b><br>
+    在 bottomBar 下方添加一个 QWidget（命名为 emojiPanel），包含多行多列 QPushButton（每个按钮放一个表情符号作 text）。初始设 visible=false。
+  </li>
+  <li>
+    <b>在 ChatWidget 构造函数中连接信号</b>
+    <pre><code><span class="cmt">// emojiBtn 已在 .ui 中定义，点击时切换 emojiPanel 的显示</span>
+<span class="fn">connect</span>(ui->emojiBtn, &QPushButton::clicked, <span class="kw">this</span>, [<span class="kw">this</span>]() {
+    ui->emojiPanel-><span class="fn">setVisible</span>(!ui->emojiPanel-><span class="fn">isVisible</span>());
+});</code></pre>
+  </li>
+  <li>
+    <b>连接每个表情按钮</b><br>
+    在构造函数中遍历 emojiPanel 的所有子按钮，连接 clicked 信号：
+    <pre><code><span class="kw">for</span> (<span class="kw">auto</span> *btn : ui->emojiPanel-><span class="fn">findChildren</span>&lt;QPushButton *&gt;()) {
+    <span class="fn">connect</span>(btn, &QPushButton::clicked, <span class="kw">this</span>, [<span class="kw">this</span>, btn]() {
+        ui->inputEdit-><span class="fn">insertPlainText</span>(btn-><span class="fn">text</span>());
+        ui->emojiPanel-><span class="fn">hide</span>();
+    });
+}</code></pre>
+  </li>
+  <li><b>重新 cmake + make，测试</b></li>
+</ol>
+
+<!-- 案例2 -->
+<h2>案例 2：显示好友在线/离线状态变化通知</h2>
+<h3>目标：好友上线/下线时，在聊天区顶部显示"XXX 已上线"提示</h3>
+
+<ol class="step-list">
+  <li>
+    <b>定义新消息类型</b><br>
+    在 <code>include/public.hpp</code> 的 <code>EnMsgType</code> 枚举中添加：
+    <pre><code>FRIEND_STATE_CHANGE_MSG = <span class="str">10</span>,  <span class="cmt">// 好友状态变更通知</span></code></pre>
+  </li>
+  <li>
+    <b>在 MainWidget::handleMessageReceived 中添加 case</b>
+    <pre><code><span class="kw">case</span> FRIEND_STATE_CHANGE_MSG:
+    <span class="fn">handleFriendStateChange</span>(js);
+    <span class="kw">break</span>;</code></pre>
+  </li>
+  <li>
+    <b>实现 handleFriendStateChange</b>
+    <pre><code><span class="kw">void</span> MainWidget::<span class="fn">handleFriendStateChange</span>(json &js) {
+    <span class="kw">int</span> friendId = js[<span class="str">"id"</span>].get&lt;<span class="kw">int</span>&gt;();
+    string state = js[<span class="str">"state"</span>].get&lt;string&gt;();
+    _contactWidget-><span class="fn">updateFriendState</span>(friendId, state);
+    <span class="cmt">// 如果当前正在和这个好友聊天，显示状态提示</span>
+    <span class="kw">if</span> (!_chatWidget-><span class="fn">isGroupChat</span>() && _chatWidget-><span class="fn">getTargetId</span>() == friendId) {
+        _chatWidget-><span class="fn">setOnlineStatus</span>(QString::<span class="fn">fromStdString</span>(state));
+    }
+}</code></pre>
+  </li>
+  <li><b>在 mainwidget.hpp 中声明新函数</b></li>
+  <li><b>在服务器端添加对应的消息发送逻辑（不在本文档范围内）</b></li>
+</ol>
+
+<!-- 案例3 -->
+<h2>案例 3：消息搜索功能</h2>
+<h3>目标：在聊天区顶部添加搜索框，输入关键词后高亮匹配的消息</h3>
+
+<ol class="step-list">
+  <li>
+    <b>在 chatwidget.ui 的 topBar 中添加 QLineEdit（命名为 searchEdit）和上一个/下一个按钮</b>
+  </li>
+  <li>
+    <b>在 ChatWidget 构造函数中连接</b>
+    <pre><code><span class="fn">connect</span>(ui->searchEdit, &QLineEdit::textChanged, <span class="kw">this</span>, [<span class="kw">this</span>](<span class="kw">const</span> QString &kw) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="str">0</span>; i &lt; ui->messageList-><span class="fn">count</span>(); ++i) {
+        <span class="kw">auto</span> *item = ui->messageList-><span class="fn">item</span>(i);
+        <span class="kw">auto</span> *bubble = <span class="kw">static_cast</span>&lt;MessageBubble *&gt;(ui->messageList-><span class="fn">itemWidget</span>(item));
+        <span class="cmt">// 检查 bubble 中的文本是否包含关键词 → setHidden</span>
+    }
+});</code></pre>
+  </li>
+  <li>
+    <b>MessageBubble 需要添加 getText() 方法</b>来暴露消息文本内容
+  </li>
+</ol>
+
+<!-- 案例4 -->
+<h2>案例 4：添加新的侧边栏按钮（如"设置"按钮）</h2>
+<h3>目标：在侧边栏添加一个齿轮图标按钮，点击后显示设置页面</h3>
+
+<ol class="step-list">
+  <li>
+    <b>在 sidebar.ui 中添加按钮</b><br>
+    在 clearHistoryBtn 下方添加新的 QPushButton，name 设为 <code>settingsBtn</code>，toolTip 设为"设置"。
+  </li>
+  <li>
+    <b>在 sidebarwidget.cpp 构造函数中设置图标和连接</b>
+    <pre><code>ui->settingsBtn-><span class="fn">setIcon</span>(<span class="fn">createSettingsIcon</span>());  <span class="cmt">// 需要新画一个图标</span>
+ui->settingsBtn-><span class="fn">setIconSize</span>(<span class="fn">QSize</span>(<span class="str">24</span>, <span class="str">24</span>));
+<span class="fn">connect</span>(ui->settingsBtn, &QPushButton::clicked, <span class="kw">this</span>, &SidebarWidget::settingsRequest);</code></pre>
+  </li>
+  <li>
+    <b>在 sidebarwidget.hpp 中添加信号</b>
+    <pre><code><span class="kw">signals</span>:
+    <span class="kw">void</span> <span class="fn">settingsRequest</span>();</code></pre>
+  </li>
+  <li>
+    <b>在 MainWidget::setupMainPage 中连接</b>
+    <pre><code><span class="fn">connect</span>(_sidebarWidget, &SidebarWidget::settingsRequest, <span class="kw">this</span>, &MainWidget::handleSettings);</code></pre>
+  </li>
+  <li>
+    <b>实现 handleSettings：新建 QDialog 或切换 _rightPanel 到新页面</b>
+  </li>
+</ol>
+
+<!-- 案例5 -->
+<h2>案例 5：消息图片支持</h2>
+<h3>目标：支持在聊天中发送和显示图片</h3>
+
+<ol class="step-list">
+  <li>
+    <b>在 messagebubble.ui 中添加 QLabel（命名为 imageLabel）</b><br>
+    初始设 hidden=true。
+  </li>
+  <li>
+    <b>修改 MessageBubble 构造函数签名</b><br>
+    添加可选参数 <code>const QPixmap *image = nullptr</code>，当传入图片时显示 imageLabel 并隐藏 bubbleLabel。
+  </li>
+  <li>
+    <b>在服务器和客户端之间定义图片消息协议</b><br>
+    例如 Base64 编码传输：<code>{"msgid":5, "type":"image", "data":"base64...", ...}</code>
+  </li>
+  <li>
+    <b>修改 ChatWidget::displayMessage</b><br>
+    判断 <code>js["type"] == "image"</code> → 解码 Base64 → 创建带图片的 MessageBubble。
+  </li>
+  <li>
+    <b>添加图片选择功能</b><br>
+    在 ChatWidget 的 attachBtn 连接 QFileDialog::getOpenFileName → 读取文件 → Base64 → 发送。
+  </li>
+</ol>
+
+
+<!-- ================================================================== -->
+<h1 id="s7">7. 构建与调试</h1>
+
+<h3>7.1 构建</h3>
+<pre><code><span class="cmt"># 首次构建</span>
+<span class="kw">cd</span> build && <span class="fn">cmake</span> .. && <span class="fn">make</span> QtChatClient
+
+<span class="cmt"># 后续构建（只改了一个 .cpp 时更快）</span>
+<span class="kw">cd</span> build && <span class="fn">make</span> QtChatClient
+
+<span class="cmt"># 构建产物</span>
+bin/QtChatClient
+</code></pre>
+
+<h3>7.2 运行</h3>
+<pre><code><span class="cmt"># 先启动服务器</span>
+./bin/ChatServer
+
+<span class="cmt"># 再启动客户端</span>
+./bin/QtChatClient <span class="str">127.0.0.1</span> <span class="str">6000</span>
+</code></pre>
+
+<h3>7.3 调试技巧</h3>
+<div class="card">
+  <p><b>1. 打印所有信号连接</b></p>
+  <pre><code><span class="cmt">// 在 main.cpp 中设置 QT_FATAL_WARNINGS 环境变量，把 Qt 警告变成致命错误</span>
+<span class="fn">qputenv</span>(<span class="str">"QT_FATAL_WARNINGS"</span>, <span class="str">"1"</span>);</code></pre>
+
+  <p><b>2. 检查信号/槽连接是否成功</b></p>
+  <pre><code><span class="kw">auto</span> conn = <span class="fn">connect</span>(...);
+<span class="fn">Q_ASSERT</span>(conn);  <span class="cmt">// 连接失败时程序会崩溃并告诉你在哪一行</span></code></pre>
+
+  <p><b>3. 快速定位崩溃</b></p>
+  <pre><code><span class="cmt"># 用 gdb 运行</span>
+<span class="fn">gdb</span> ./bin/QtChatClient
+(gdb) <span class="fn">run</span> <span class="str">127.0.0.1</span> <span class="str">6000</span>
+<span class="cmt"># 崩溃后</span>
+(gdb) <span class="fn">bt</span>     <span class="cmt"># 查看调用栈</span>
+(gdb) <span class="fn">frame</span> <span class="str">0</span>  <span class="cmt"># 跳转到崩溃位置</span></code></pre>
+</div>
+
+
+<!-- ================================================================== -->
+<h1 id="s8">8. 常见问题排查 (FAQ)</h1>
+
+<details>
+<summary>Q: 编译报错 "undefined reference to vtable for XxxWidget"</summary>
+<div class="answer">
+  <p><b>原因：</b>忘记写 <code>Q_OBJECT</code> 宏，或者头文件没有被 MOC 扫描到。</p>
+  <p><b>解决：</b></p>
+  <ol>
+    <li>确认类定义中写了 <code>Q_OBJECT</code></li>
+    <li>确认头文件在 CMakeLists.txt 的 HEADER_LIST 中</li>
+    <li><code>cd build && cmake .. && make</code> — <b>只改过头文件时必须要重新 cmake</b></li>
+  </ol>
+</div>
+</details>
+
+<details>
+<summary>Q: 信号和槽连上了但槽函数没有被调用</summary>
+<div class="answer">
+  <p><b>原因：</b></p>
+  <ul>
+    <li>信号和槽的参数签名不匹配</li>
+    <li>使用了旧式 SIGNAL()/SLOT() 宏，字符串写错了</li>
+    <li>connect 返回的 QMetaObject::Connection 没有保存——说明是在对象销毁后才连接的</li>
+  </ul>
+  <p><b>解决：</b>使用新式函数指针语法 <code>&Class::method</code>，编译期就能检查签名。</p>
+</div>
+</details>
+
+<details>
+<summary>Q: 中文输入法无法使用</summary>
+<div class="answer">
+  <p><b>排查步骤：</b></p>
+  <ol>
+    <li>确认 <code>QPlainTextEdit</code>（不是 QTextEdit）用作输入框</li>
+    <li>确认构造函数中设置了 <code>setAttribute(Qt::WA_InputMethodEnabled, true)</code></li>
+    <li>尝试修改 main.cpp 中的 <code>QT_IM_MODULE</code>：空字符串、<code>"ibus"</code>、<code>"fcitx"</code>、<code>"xim"</code></li>
+    <li>检查 WSL/Linux 系统中是否安装了输入法：<code>fcitx-diagnose</code> 或 <code>ibus version</code></li>
+  </ol>
+</div>
+</details>
+
+<details>
+<summary>Q: .ui 文件修改后没有生效</summary>
+<div class="answer">
+  <p><b>原因：</b>改了 .ui 文件但没有重新运行 cmake，UIC 没有重新生成 ui_xxx.h。</p>
+  <p><b>解决：</b>只要改过 .ui 文件，就要 <code>cd build && cmake .. && make</code>。不能只 make。</p>
+</div>
+</details>
+
+<details>
+<summary>Q: 消息气泡没有显示</summary>
+<div class="answer">
+  <p><b>可能原因：</b></p>
+  <ul>
+    <li>QListWidgetItem 没有设置 sizeHint → <code>item->setSizeHint(bubble->sizeHint())</code></li>
+    <li>QListWidget 的 spacing 太大导致 item 被遮挡</li>
+    <li>MessageBubble 的 UI 布局有问题，导致高度为 0</li>
+  </ul>
+</div>
+</details>
+
+<details>
+<summary>Q: 如何在不启动客户端的情况下测试 UI</summary>
+<div class="answer">
+  <p>写一个简单的独立 main.cpp，只创建你要测试的 Widget：</p>
+  <pre><code><span class="kw">int</span> <span class="fn">main</span>(<span class="kw">int</span> argc, <span class="kw">char</span> *argv[]) {
+    QApplication <span class="fn">app</span>(argc, argv);
+    ChatWidget w;
+    w.<span class="fn">show</span>();
+    <span class="kw">return</span> app.<span class="fn">exec</span>();
+}</code></pre>
+</div>
+</details>
+
+
+<!-- ================================================================== -->
+<h1 id="s9">9. Qt 信号/槽 API 速查</h1>
+
+<div class="card">
+<h3>连接方式</h3>
+<pre><code><span class="cmt">// 方式1：新式（推荐）—— 类型安全，编译期检查</span>
+<span class="fn">connect</span>(sender, &SenderClass::signalName, receiver, &ReceiverClass::slotName);
+
+<span class="cmt">// 方式2：Lambda（灵活）—— 适合简单逻辑</span>
+<span class="fn">connect</span>(btn, &QPushButton::clicked, <span class="kw">this</span>, [<span class="kw">this</span>]() {
+    <span class="cmt">// 直接写逻辑，不用声明槽函数</span>
+    <span class="fn">doSomething</span>();
+});
+
+<span class="cmt">// 方式3：带参数的 Lambda</span>
+<span class="fn">connect</span>(slider, &QSlider::valueChanged, <span class="kw">this</span>, [<span class="kw">this</span>](<span class="kw">int</span> value) {
+    label-><span class="fn">setNum</span>(value);
+});
+
+<span class="cmt">// 方式4：信号→信号（转发）</span>
+<span class="fn">connect</span>(a, &A::sig1, b, &B::sig2);  <span class="cmt">// a的sig1触发时自动emit b的sig2</span>
+</code></pre>
+
+<h3>常用 Widget 信号</h3>
+<table>
+<tr><th>Widget</th><th>常用信号</th><th>参数含义</th></tr>
+<tr><td>QPushButton</td><td><code>clicked()</code></td><td>按钮被点击（左键）</td></tr>
+<tr><td>QLineEdit</td><td><code>textChanged(QString)</code></td><td>文本每次变化时触发</td></tr>
+<tr><td>QLineEdit</td><td><code>returnPressed()</code></td><td>按回车键时触发</td></tr>
+<tr><td>QListWidget</td><td><code>itemDoubleClicked(QListWidgetItem*)</code></td><td>双击列表项</td></tr>
+<tr><td>QTcpSocket</td><td><code>readyRead()</code></td><td>有数据可读</td></tr>
+<tr><td>QTcpSocket</td><td><code>connected()</code></td><td>TCP 连接成功</td></tr>
+</table>
+</div>
+
+<p style="text-align:center; margin:60px 0 20px; color:var(--muted);">
+  — 手册完 —<br>
+  有问题看源码注释，源码注释比这个手册更详细。
+</p>
+
+</div>
+</body>
+</html>

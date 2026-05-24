@@ -1,0 +1,11 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/woshi/chat/chat/build/cmake_install.cmake",
+		"/home/woshi/chat/chat/build/src/cmake_install.cmake",
+		"/home/woshi/chat/chat/build/src/server/cmake_install.cmake",
+		"/home/woshi/chat/chat/build/src/client/cmake_install.cmake",
+		"/home/woshi/chat/chat/build/src/qtclient/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

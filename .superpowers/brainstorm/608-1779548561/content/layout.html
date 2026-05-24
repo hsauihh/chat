@@ -1,0 +1,29 @@
+<h2>Qt 聊天客户端 - 整体布局方案</h2>
+<p class="subtitle">参考现有终端客户端的功能：登录/注册、好友列表、群组列表、一对一聊天、群聊、添加好友、创建/加入群组</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>经典三栏布局</h3>
+      <p>左侧：联系人列表（好友+群组） | 中间：聊天区域 | 右侧：用户信息/设置面板</p>
+      <p style="color: var(--text-secondary); font-size: 0.85em;">类似微信桌面版，功能分区清晰，适合常用聊天操作</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>双栏布局</h3>
+      <p>左侧：联系人+群组列表（带Tab切换） | 右侧：聊天区域</p>
+      <p style="color: var(--text-secondary); font-size: 0.85em;">更简洁，窗口可以更窄，类似 QQ 简洁模式</p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>标签页式布局</h3>
+      <p>顶部 Tab 切换（消息/联系人/群组），每个 Tab 内独立布局</p>
+      <p style="color: var(--text-secondary); font-size: 0.85em;">适合移动端风格，每个功能独立空间大</p>
+    </div>
+  </div>
+</div>

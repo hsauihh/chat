@@ -1,0 +1,15 @@
+/home/woshi/chat/chat/build/CMakeFiles/edit_cache.dir
+/home/woshi/chat/chat/build/CMakeFiles/rebuild_cache.dir
+/home/woshi/chat/chat/build/src/CMakeFiles/edit_cache.dir
+/home/woshi/chat/chat/build/src/CMakeFiles/rebuild_cache.dir
+/home/woshi/chat/chat/build/src/server/CMakeFiles/ChatServer.dir
+/home/woshi/chat/chat/build/src/server/CMakeFiles/edit_cache.dir
+/home/woshi/chat/chat/build/src/server/CMakeFiles/rebuild_cache.dir
+/home/woshi/chat/chat/build/src/client/CMakeFiles/ChatClient.dir
+/home/woshi/chat/chat/build/src/client/CMakeFiles/edit_cache.dir
+/home/woshi/chat/chat/build/src/client/CMakeFiles/rebuild_cache.dir
+/home/woshi/chat/chat/build/src/qtclient/CMakeFiles/QtChatClient.dir
+/home/woshi/chat/chat/build/src/qtclient/CMakeFiles/edit_cache.dir
+/home/woshi/chat/chat/build/src/qtclient/CMakeFiles/rebuild_cache.dir
+/home/woshi/chat/chat/build/src/qtclient/CMakeFiles/QtChatClient_autogen_timestamp_deps.dir
+/home/woshi/chat/chat/build/src/qtclient/CMakeFiles/QtChatClient_autogen.dir

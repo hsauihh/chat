@@ -1,0 +1,11 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/woshi/chat/chat/build/Desktop-Debug/cmake_install.cmake",
+		"/home/woshi/chat/chat/build/Desktop-Debug/src/cmake_install.cmake",
+		"/home/woshi/chat/chat/build/Desktop-Debug/src/server/cmake_install.cmake",
+		"/home/woshi/chat/chat/build/Desktop-Debug/src/client/cmake_install.cmake",
+		"/home/woshi/chat/chat/build/Desktop-Debug/src/qtclient/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

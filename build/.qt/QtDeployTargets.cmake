@@ -1,0 +1,6 @@
+set(__QT_DEPLOY_TARGET_ChatServer_FILE /home/woshi/chat/chat/bin/ChatServer)
+set(__QT_DEPLOY_TARGET_ChatServer_TYPE EXECUTABLE)
+set(__QT_DEPLOY_TARGET_ChatClient_FILE /home/woshi/chat/chat/bin/ChatClient)
+set(__QT_DEPLOY_TARGET_ChatClient_TYPE EXECUTABLE)
+set(__QT_DEPLOY_TARGET_QtChatClient_FILE /home/woshi/chat/chat/bin/QtChatClient)
+set(__QT_DEPLOY_TARGET_QtChatClient_TYPE EXECUTABLE)

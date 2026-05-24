@@ -1,0 +1,51 @@
+{
+	"backtrace" : 0,
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : 
+		[
+			"src/qtclient/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 9
+	},
+	"id" : "QtChatClient_autogen_timestamp_deps::@a3eb424482ab31b2b3cc",
+	"isGeneratorProvided" : true,
+	"name" : "QtChatClient_autogen_timestamp_deps",
+	"orderDependencies" : 
+	[
+		{
+			"backtrace" : 0,
+			"id" : "Qt6::moc::@a3eb424482ab31b2b3cc"
+		},
+		{
+			"backtrace" : 0,
+			"id" : "Qt6::uic::@a3eb424482ab31b2b3cc"
+		},
+		{
+			"backtrace" : 0,
+			"id" : "Qt6::Widgets::@a3eb424482ab31b2b3cc"
+		},
+		{
+			"backtrace" : 0,
+			"id" : "Qt6::Network::@a3eb424482ab31b2b3cc"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "src/qtclient",
+		"source" : "src/qtclient"
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}
