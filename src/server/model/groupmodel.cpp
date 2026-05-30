@@ -35,6 +35,22 @@ void GroupModel::addGroup(int userid, int groupid, string role)
     }
 }
 
+// 退出群聊
+void GroupModel::remove(int userid, int groupid)
+{
+    
+    // 组装sql语句
+    char sql[1024] = {0};
+    sprintf(sql, "DELETE FROM GroupUser 
+WHERE (groupid = %d AND userid = %d);", groupid, userid);
+
+    MySQL mysql;
+    if (mysql.connect())
+    {
+        mysql.update(sql);
+    }
+}
+
 // 查询用户所在群组信息
 vector<Group> GroupModel::queryGroups(int userid)
 {
@@ -85,7 +101,6 @@ vector<Group> GroupModel::queryGroups(int userid)
                 user.setState(row[2]);
                 user.setRole(row[3]);
                 group.getUsers().push_back(user);
-                
             }
             mysql_free_result(res);
         }
@@ -96,7 +111,7 @@ vector<Group> GroupModel::queryGroups(int userid)
 // 根据指定的Group查询群组用户id列表,除去userid自己,主要用户群聊业务给其他成员群发消息
 vector<int> GroupModel::queryGroupUsers(int userid, int groupid)
 {
-        // 组装sql语句
+    // 组装sql语句
     char sql[1024] = {0};
     sprintf(sql, "select userid from GroupUser where groupid=%d and userid!=%d", groupid, userid);
 

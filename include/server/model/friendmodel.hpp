@@ -12,6 +12,9 @@ public:
     // 添加好友消息
     void insert(int userid, int friendid);
 
+    // 删除好友信息
+    void remove(int userid, int friendid);
+
     // 返回用户好友列表 friendid name
     vector<User> query(int userid);
 };

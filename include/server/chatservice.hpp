@@ -41,8 +41,10 @@ public:
     void addGroup(const TcpConnectionPtr &conn, json &js, Timestamp time);
     // 群组聊天业务
     void groupChat(const TcpConnectionPtr &conn, json &js, Timestamp time);
-    // 处理注销业务
+    // 处理登出业务
     void loginout(const TcpConnectionPtr &conn, json &js, Timestamp time);
+    // 处理注销业务
+    void Delete(const TcpConnectionPtr &conn, json &js, Timestamp time);
     // 从redis消息队列中获取对应的消息
     void handlerRedisSubcribeMessage(int userid, string msg);
     // 获取消息对应的处理器

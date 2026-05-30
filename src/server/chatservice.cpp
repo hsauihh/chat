@@ -349,6 +349,22 @@ void ChatService::groupChat(const TcpConnectionPtr &conn, json &js, Timestamp ti
     LOG_INFO << "GROUPCHAT SUCCESS!";
 }
 
+// 删除账号业务
+ChatService::Delete(const TcpConnectionPtr &conn, json &js, Timestamp time)
+{
+    int userid = js["id"].get<int>();
+    string password = js["pwd"];
+    User user = _userModel.query(userid);
+    if (user.getPwd() != password)
+    {
+        cout << "魔丸" << endl;
+    }
+    else
+    {
+        _userModel.deleteUser(userid);
+    }
+}
+
 // 从redis消息队列中获取对应的消息
 void ChatService::handlerRedisSubcribeMessage(int userid, string msg)
 {

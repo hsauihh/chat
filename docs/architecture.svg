@@ -1,0 +1,89 @@
+<svg width="100%" viewBox="0 0 680 540" role="img">
+  <title>聊天应用系统架构图</title>
+  <desc>三层架构概览：三种客户端(C++终端/Qt6 GUI/QML)通过 JSON/TCP 连接服务端，经 ChatServer 网络层分派到 ChatService 业务层，底层使用 MySQL 持久化和 Redis 跨服务器通信</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5"
+            markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke"
+            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <style>
+    .node { cursor: pointer; }
+    .node rect { fill: var(--fill, #f0f0f0); stroke: var(--stroke, #888); }
+    .th { font: bold 14px sans-serif; fill: var(--text, #1a1a1a); }
+    .ts { font: 12px sans-serif; fill: var(--ts, #555); }
+    .arr { stroke: var(--arr-color, #888); stroke-width: 1.5; }
+    .c-teal { --fill: #e6f7f0; --stroke: #1D9E75; --arr-color: #1D9E75; }
+    .c-teal .th { fill: #0d6b4f; }
+    .c-teal .ts { fill: #1D9E75; }
+    .c-purple { --fill: #f0eeff; --stroke: #7F77DD; --arr-color: #7F77DD; }
+    .c-purple .th { fill: #4f48a0; }
+    .c-purple .ts { fill: #7F77DD; }
+    .c-amber { --fill: #fef4e6; --stroke: #BA7517; --arr-color: #BA7517; }
+    .c-amber .th { fill: #7a4f10; }
+    .c-amber .ts { fill: #BA7517; }
+    .layer-label { font: bold 13px sans-serif; fill: #ccc; letter-spacing: 2px; }
+    .proto-label { font: 12px sans-serif; fill: #999; }
+    @media (prefers-color-scheme: dark) {
+      .th { fill: #e0e0e0; }
+      .ts { fill: #aaa; }
+      .proto-label { fill: #888; }
+      .c-teal { --fill: #1a3d30; --stroke: #34d399; --arr-color: #34d399; }
+      .c-teal .th { fill: #6ee7b7; }
+      .c-teal .ts { fill: #34d399; }
+      .c-purple { --fill: #2a2650; --stroke: #a29bfe; --arr-color: #a29bfe; }
+      .c-purple .th { fill: #c4bdfe; }
+      .c-purple .ts { fill: #a29bfe; }
+      .c-amber { --fill: #3d2e14; --stroke: #fbbf24; --arr-color: #fbbf24; }
+      .c-amber .th { fill: #fcd34d; }
+      .c-amber .ts { fill: #fbbf24; }
+    }
+  </style>
+  <text class="layer-label" x="22" y="83" text-anchor="middle" transform="rotate(-90,22,83)">客户端</text>
+  <text class="layer-label" x="22" y="263" text-anchor="middle" transform="rotate(-90,22,263)">服务端</text>
+  <text class="layer-label" x="22" y="453" text-anchor="middle" transform="rotate(-90,22,453)">数据层</text>
+  <g class="node c-teal">
+    <rect x="40" y="55" width="130" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="105" y="75" text-anchor="middle" dominant-baseline="central">终端客户端</text>
+    <text class="ts" x="105" y="93" text-anchor="middle" dominant-baseline="central">C++ · POSIX Socket · CLI</text>
+  </g>
+  <g class="node c-teal">
+    <rect x="275" y="55" width="130" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="340" y="75" text-anchor="middle" dominant-baseline="central">Qt 客户端</text>
+    <text class="ts" x="340" y="93" text-anchor="middle" dominant-baseline="central">Qt6 Widgets · 图形界面</text>
+  </g>
+  <g class="node c-teal">
+    <rect x="510" y="55" width="130" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="575" y="75" text-anchor="middle" dominant-baseline="central">QML 应用</text>
+    <text class="ts" x="575" y="93" text-anchor="middle" dominant-baseline="central">Qt6 Quick · 开发中</text>
+  </g>
+  <g class="node c-purple">
+    <rect x="80" y="175" width="520" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="340" y="195" text-anchor="middle" dominant-baseline="central">ChatServer — 网络层</text>
+    <text class="ts" x="340" y="213" text-anchor="middle" dominant-baseline="central">muduo TcpServer · 4 个 IO 线程 · onMessage 回调 · JSON 反序列化</text>
+  </g>
+  <g class="node c-purple">
+    <rect x="150" y="295" width="380" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="340" y="315" text-anchor="middle" dominant-baseline="central">ChatService — 业务层</text>
+    <text class="ts" x="340" y="333" text-anchor="middle" dominant-baseline="central">单例 · msgid→Handler 路由 · _userConnectionMap 在线管理</text>
+  </g>
+  <g class="node c-amber">
+    <rect x="165" y="425" width="150" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="240" y="445" text-anchor="middle" dominant-baseline="central">MySQL</text>
+    <text class="ts" x="240" y="463" text-anchor="middle" dominant-baseline="central">用户 · 好友 · 群组 · 离线消息</text>
+  </g>
+  <g class="node c-amber">
+    <rect x="365" y="425" width="150" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="440" y="445" text-anchor="middle" dominant-baseline="central">Redis</text>
+    <text class="ts" x="440" y="463" text-anchor="middle" dominant-baseline="central">Pub/Sub · 跨服务器消息投递</text>
+  </g>
+  <line x1="105" y1="111" x2="105" y2="173" class="arr" marker-end="url(#arrow)"/>
+  <line x1="340" y1="111" x2="340" y2="173" class="arr" marker-end="url(#arrow)"/>
+  <line x1="575" y1="111" x2="575" y2="173" class="arr" marker-end="url(#arrow)"/>
+  <line x1="340" y1="231" x2="340" y2="293" class="arr" marker-end="url(#arrow)"/>
+  <path d="M 340 351 L 340 395 L 240 395 L 240 423" fill="none" class="arr" marker-end="url(#arrow)"/>
+  <path d="M 340 351 L 340 395 L 440 395 L 440 423" fill="none" class="arr" marker-end="url(#arrow)"/>
+  <text class="proto-label" x="340" y="138" text-anchor="middle">JSON over TCP · NUL 分隔帧</text>
+  <text class="ts" x="340" y="373" text-anchor="middle">Data Models: UserModel · FriendModel · GroupModel · OfflineMsgModel</text>
+</svg>

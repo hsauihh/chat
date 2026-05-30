@@ -83,3 +83,19 @@ void UserModel::resetState()
         mysql.update(sql);
     }
 }
+
+// 删除用户信息
+void UserModel::deleteUser(int userid)
+{
+    // 组装sql语句
+    char sql[1024] = {0};
+    sprintf(sql, "delete from User where id = %d;", userid);
+
+    
+    MySQL mysql;
+    if (mysql.connect())
+    {
+        mysql.update(sql);
+    }
+    
+}

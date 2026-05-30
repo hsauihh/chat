@@ -14,6 +14,8 @@ class GroupModel
     bool creatGroup(Group &group);
     // 加入群组
     void addGroup(int userid, int groupid, string role);
+    // 退出群聊
+    void remove(int userid, int groupid);
     // 查询用户所在群组信息
     vector<Group> queryGroups(int userid);
     // 根据指定的Group查询群组用户id列表,除去userid自己,主要用户群聊业务给其他成员群发消息

@@ -18,6 +18,8 @@ public:
     // 重置用户的状态信息
     void resetState();
 
+    // 删除用户信息
+    void deleteUser();
 };
 
 #endif
