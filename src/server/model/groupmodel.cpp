@@ -38,11 +38,9 @@ void GroupModel::addGroup(int userid, int groupid, string role)
 // 退出群聊
 void GroupModel::remove(int userid, int groupid)
 {
-    
     // 组装sql语句
     char sql[1024] = {0};
-    sprintf(sql, "DELETE FROM GroupUser 
-WHERE (groupid = %d AND userid = %d);", groupid, userid);
+    sprintf(sql, "DELETE FROM GroupUser WHERE (groupid = %d AND userid = %d);", groupid, userid);
 
     MySQL mysql;
     if (mysql.connect())

@@ -1,6 +1,7 @@
 #include "chatservice.hpp"
 #include "public.hpp"
 #include <muduo/base/Logging.h>
+#include <iostream>
 #include <string>
 #include <vector>
 #include <map>
@@ -26,6 +27,8 @@ ChatService::ChatService()
     _msgHandlerMap.insert({CREAT_GROUP_MSG, std::bind(&ChatService::creatGroup, this, _1, _2, _3)});
     _msgHandlerMap.insert({ADD_GROUP_MSG, std::bind(&ChatService::addGroup, this, _1, _2, _3)});
     _msgHandlerMap.insert({GROUP_CHAT_MSG, std::bind(&ChatService::groupChat, this, _1, _2, _3)});
+    _msgHandlerMap.insert({IMAGE_CHAT_MSG, std::bind(&ChatService::imageChat, this, _1, _2, _3)});
+    _msgHandlerMap.insert({GROUP_IMAGE_CHAT_MSG, std::bind(&ChatService::groupImageChat, this, _1, _2, _3)});
     // 连接redis服务器
     if (_redis.connect())
     {
@@ -77,7 +80,7 @@ void ChatService::login(const TcpConnectionPtr &conn, json &js, Timestamp time)
             response["msgid"] = LOGIN_MSG_ACK;
             response["errno"] = 2;
             response["errmsg"] = "该账号已经登录";
-            conn->send(response.dump());
+            conn->send(response.dump() + '\0');
         }
         else
         {
@@ -156,7 +159,7 @@ void ChatService::login(const TcpConnectionPtr &conn, json &js, Timestamp time)
                 response["groups"] = vec3;
             }
 
-            conn->send(response.dump());
+            conn->send(response.dump() + '\0');
         }
     }
     else
@@ -166,7 +169,7 @@ void ChatService::login(const TcpConnectionPtr &conn, json &js, Timestamp time)
         response["msgid"] = LOGIN_MSG_ACK;
         response["errno"] = 1;
         response["errmsg"] = "用户名或密码错误";
-        conn->send(response.dump());
+        conn->send(response.dump() + '\0');
     }
 }
 
@@ -209,7 +212,7 @@ void ChatService::reg(const TcpConnectionPtr &conn, json &js, Timestamp time)
         response["msgid"] = REG_MSG_ACK;
         response["errno"] = 0;
         response["id"] = user.getId();
-        conn->send(response.dump());
+        conn->send(response.dump() + '\0');
     }
     else
     {
@@ -217,7 +220,7 @@ void ChatService::reg(const TcpConnectionPtr &conn, json &js, Timestamp time)
         json response;
         response["msgid"] = REG_MSG_ACK;
         response["errno"] = 1;
-        conn->send(response.dump());
+        conn->send(response.dump() + '\0');
     }
 }
 
@@ -261,7 +264,7 @@ void ChatService::oneChat(const TcpConnectionPtr &conn, json &js, Timestamp time
         if (it != _userConnectionMap.end())
         {
             // 用户在线 转发消息 服务器主动推送消息给toid用户
-            it->second->send(js.dump());
+            it->second->send(js.dump() + '\0');
             return;
         }
 
@@ -273,6 +276,32 @@ void ChatService::oneChat(const TcpConnectionPtr &conn, json &js, Timestamp time
         }
 
         // 用户不在线
+        _offlineMessageModel.insert(toid, js.dump());
+    }
+}
+
+// 一对一图片聊天业务（复用 oneChat 路由逻辑）
+void ChatService::imageChat(const TcpConnectionPtr &conn, json &js, Timestamp time)
+{
+    LOG_INFO << " DO IMAGE_CHAT SERVICE";
+    int toid = js["to"].get<int>();
+
+    {
+        lock_guard<mutex> lock(_connMutex);
+        auto it = _userConnectionMap.find(toid);
+        if (it != _userConnectionMap.end())
+        {
+            it->second->send(js.dump() + '\0');
+            return;
+        }
+
+        User user = _userModel.query(toid);
+        if (user.getState() == "online")
+        {
+            _redis.publish(toid, js.dump());
+            return;
+        }
+
         _offlineMessageModel.insert(toid, js.dump());
     }
 }
@@ -321,36 +350,73 @@ void ChatService::groupChat(const TcpConnectionPtr &conn, json &js, Timestamp ti
     int groupid = js["groupid"].get<int>();
     vector<int> useridVec = _groupModel.queryGroupUsers(userid, groupid);
 
-    lock_guard<mutex> lock(_connMutex);
     for (int id : useridVec)
     {
         LOG_INFO << "转发群成员: id = " << id;
-        auto it = _userConnectionMap.find(id);
-        if (it != _userConnectionMap.end())
+        bool onlineLocal = false;
         {
-            // 转发群消息
-            it->second->send(js.dump());
+            lock_guard<mutex> lock(_connMutex);
+            auto it = _userConnectionMap.find(id);
+            if (it != _userConnectionMap.end())
+            {
+                it->second->send(js.dump() + '\0');
+                onlineLocal = true;
+            }
+        }
+
+        if (onlineLocal) continue;
+
+        User user = _userModel.query(id);
+        if (user.getState() == "online")
+        {
+            _redis.publish(id, js.dump());
         }
         else
         {
-            User user = _userModel.query(id);
-            if (user.getState() == "online")
-            {
-                _redis.publish(id, js.dump());
-                return;
-            }
-            else
-            {
-                // 存储离线消息
-                _offlineMessageModel.insert(id, js.dump());
-            }
+            // 存储离线消息
+            _offlineMessageModel.insert(id, js.dump());
         }
     }
     LOG_INFO << "GROUPCHAT SUCCESS!";
 }
 
+// 群组图片聊天业务（复用 groupChat 路由逻辑）
+void ChatService::groupImageChat(const TcpConnectionPtr &conn, json &js, Timestamp time)
+{
+    LOG_INFO << " DO GROUP_IMAGE_CHAT SERVICE";
+    int userid = js["id"].get<int>();
+    int groupid = js["groupid"].get<int>();
+    vector<int> useridVec = _groupModel.queryGroupUsers(userid, groupid);
+
+    for (int id : useridVec)
+    {
+        bool onlineLocal = false;
+        {
+            lock_guard<mutex> lock(_connMutex);
+            auto it = _userConnectionMap.find(id);
+            if (it != _userConnectionMap.end())
+            {
+                it->second->send(js.dump() + '\0');
+                onlineLocal = true;
+            }
+        }
+
+        if (onlineLocal) continue;
+
+        User user = _userModel.query(id);
+        if (user.getState() == "online")
+        {
+            _redis.publish(id, js.dump());
+        }
+        else
+        {
+            _offlineMessageModel.insert(id, js.dump());
+        }
+    }
+}
+
 // 删除账号业务
-ChatService::Delete(const TcpConnectionPtr &conn, json &js, Timestamp time)
+void ChatService::Delete(const TcpConnectionPtr &conn, json &js, Timestamp time)
 {
     int userid = js["id"].get<int>();
     string password = js["pwd"];
@@ -374,7 +440,7 @@ void ChatService::handlerRedisSubcribeMessage(int userid, string msg)
     auto it = _userConnectionMap.find(userid);
     if (it != _userConnectionMap.end())
     {
-        it->second->send(js.dump());
+        it->second->send(js.dump() + '\0');
         return;
     }
 

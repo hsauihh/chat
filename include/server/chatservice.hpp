@@ -33,6 +33,8 @@ public:
     void reg(const TcpConnectionPtr &conn, json &js, Timestamp time);
     // 一对一聊天业务
     void oneChat(const TcpConnectionPtr &conn, json &js, Timestamp time);
+    // 一对一图片聊天业务
+    void imageChat(const TcpConnectionPtr &conn, json &js, Timestamp time);
     // 添加好友业务
     void addFriend(const TcpConnectionPtr &conn, json &js, Timestamp time);
     // 创建群组业务
@@ -41,6 +43,8 @@ public:
     void addGroup(const TcpConnectionPtr &conn, json &js, Timestamp time);
     // 群组聊天业务
     void groupChat(const TcpConnectionPtr &conn, json &js, Timestamp time);
+    // 群组图片聊天业务
+    void groupImageChat(const TcpConnectionPtr &conn, json &js, Timestamp time);
     // 处理登出业务
     void loginout(const TcpConnectionPtr &conn, json &js, Timestamp time);
     // 处理注销业务

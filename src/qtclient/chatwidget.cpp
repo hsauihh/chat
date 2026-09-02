@@ -26,6 +26,12 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QFile>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QImageReader>
+#include <QFileInfo>
+#include <QByteArray>
+#include <QCryptographicHash>
 #include <fstream>
 #include <iostream>
 
@@ -50,6 +56,16 @@ ChatWidget::ChatWidget(QWidget *parent)
 
     // 发送按钮 → 发射信号（实际网络发送由 MainWidget 处理）
     connect(ui->sendBtn, &QPushButton::clicked, this, &ChatWidget::onSendClicked);
+
+    // 图片按钮（程序化创建，避免修改 .ui 文件）
+    QPushButton *imageBtn = new QPushButton("图片");
+    imageBtn->setMinimumSize(32, 32);
+    imageBtn->setMaximumSize(32, 32);
+    imageBtn->setFlat(true);
+    imageBtn->setStyleSheet("font-size: 12px; color: #333;");
+    connect(imageBtn, &QPushButton::clicked, this, &ChatWidget::onImageClicked);
+    // 插入到 inputEdit 之前（index 2 = emojiBtn, attachBtn, 新按钮, inputEdit, sendBtn）
+    ui->bottomBarLayout->insertWidget(2, imageBtn);
 }
 
 ChatWidget::~ChatWidget()
@@ -81,6 +97,59 @@ string ChatWidget::makeChatKey(int id, bool isGroup) const
 QString ChatWidget::storageDir() const
 {
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/messages";
+}
+
+/*
+ * assetsDir — 获取图片资源存储目录（按聊天对象分目录）
+ *   <storageDir>/assets/user_<id>/  或  <storageDir>/assets/group_<id>/
+ */
+QString ChatWidget::assetsDir() const
+{
+    if (_targetId < 0) return QString();
+    string key = makeChatKey(_targetId, _isGroupChat);
+    return storageDir() + "/assets/" + QString::fromStdString(key);
+}
+
+QString ChatWidget::assetsDirFor(int targetId, bool isGroup) const
+{
+    string key = makeChatKey(targetId, isGroup);
+    return storageDir() + "/assets/" + QString::fromStdString(key);
+}
+
+/*
+ * saveImageToAssets — 将 Base64 图片解码保存到 assets 目录
+ * 返回保存后的本地路径，失败返回空字符串
+ */
+QString ChatWidget::saveImageToAssets(const string &imageBase64, const string &filename)
+{
+    return saveImageToAssets(imageBase64, filename, _targetId, _isGroupChat);
+}
+
+QString ChatWidget::saveImageToAssets(const string &imageBase64, const string &filename,
+                                       int targetId, bool isGroup)
+{
+    if (targetId < 0) return QString();
+    QString dir = assetsDirFor(targetId, isGroup);
+    QDir().mkpath(dir);
+
+    QByteArray base64Data = QByteArray::fromStdString(imageBase64);
+    QByteArray imgData = QByteArray::fromBase64(base64Data);
+    if (imgData.isEmpty()) return QString();
+
+    QString safeName = QString("%1_%2_%3")
+        .arg(QDateTime::currentMSecsSinceEpoch())
+        .arg(QString(QCryptographicHash::hash(imgData, QCryptographicHash::Md5).toHex().left(8)))
+        .arg(QString::fromStdString(filename));
+    QString path = dir + "/" + safeName;
+
+    QFile file(path);
+    if (file.open(QIODevice::WriteOnly))
+    {
+        file.write(imgData);
+        file.close();
+        return path;
+    }
+    return QString();
 }
 
 // ============================================================================
@@ -174,18 +243,20 @@ void ChatWidget::loadMessagesForTarget()
     // 遍历消息列表，为每条消息创建 QListWidgetItem + MessageBubble
     for (const auto &js : it->second)
     {
-        QString senderName, message, timeStr;
+        QString senderName, message, timeStr, imagePath;
         if (js.contains("name"))
             senderName = QString::fromStdString(js["name"].get<string>());
         if (js.contains("msg"))
             message = QString::fromStdString(js["msg"].get<string>());
         if (js.contains("time"))
             timeStr = QString::fromStdString(js["time"].get<string>());
+        if (js.contains("localpath"))
+            imagePath = QString::fromStdString(js["localpath"].get<string>());
 
         int senderId = js.contains("id") ? js["id"].get<int>() : -1;
         bool isSelf = (senderId == _currentUserId);
 
-        auto *bubble = new MessageBubble(senderName, message, timeStr, isSelf);
+        auto *bubble = new MessageBubble(senderName, message, timeStr, isSelf, imagePath);
 
         // 【Qt 概念】QListWidgetItem 包装 MessageBubble widget
         // setSizeHint 告诉 QListWidget 这个 item 的高度 = bubble 的高度
@@ -271,9 +342,29 @@ void ChatWidget::displayMessage(const json &js)
             return;
         }
     }
+    else if (msgid == IMAGE_CHAT_MSG)
+    {
+        int senderId = js["id"].get<int>();
+        int toId = js.contains("to") ? js["to"].get<int>() : -1;
+        int peerId = (senderId == _currentUserId) ? toId : senderId;
+        if (_isGroupChat || _targetId != peerId)
+        {
+            storeMessage(js);
+            return;
+        }
+    }
+    else if (msgid == GROUP_IMAGE_CHAT_MSG)
+    {
+        int groupId = js["groupid"].get<int>();
+        if (!_isGroupChat || _targetId != groupId)
+        {
+            storeMessage(js);
+            return;
+        }
+    }
 
     // ---- 渲染消息气泡 ----
-    QString senderName, message, timeStr;
+    QString senderName, message, timeStr, imagePath;
     if (js.contains("name"))
         senderName = QString::fromStdString(js["name"].get<string>());
     if (js.contains("msg"))
@@ -284,16 +375,42 @@ void ChatWidget::displayMessage(const json &js)
     int senderId = js.contains("id") ? js["id"].get<int>() : -1;
     bool isSelf = (senderId == _currentUserId);
 
-    auto *bubble = new MessageBubble(senderName, message, timeStr, isSelf);
+    // 构造用于本地存储的 JSON（图片消息去掉 Base64，换为 localpath）
+    json storeJson = js;
 
-    QListWidgetItem *item = new QListWidgetItem;
-    item->setSizeHint(bubble->sizeHint());
-    ui->messageList->addItem(item);
-    ui->messageList->setItemWidget(item, bubble);
+    // 图片消息：将 Base64 保存到本地，用 localpath 替换 image 字段
+    if ((msgid == IMAGE_CHAT_MSG || msgid == GROUP_IMAGE_CHAT_MSG) && js.contains("image"))
+    {
+        string filename = js.contains("filename") ? js["filename"].get<string>() : "image.png";
+        string base64 = js["image"].get<string>();
+        imagePath = saveImageToAssets(base64, filename);
+
+        storeJson.erase("image");
+        if (!imagePath.isEmpty())
+            storeJson["localpath"] = imagePath.toStdString();
+
+        auto *bubble = new MessageBubble(senderName, "", timeStr, isSelf, imagePath);
+
+        QListWidgetItem *item = new QListWidgetItem;
+        item->setSizeHint(bubble->sizeHint());
+        ui->messageList->addItem(item);
+        ui->messageList->setItemWidget(item, bubble);
+    }
+    else
+    {
+        // 文本消息
+        auto *bubble = new MessageBubble(senderName, message, timeStr, isSelf);
+
+        QListWidgetItem *item = new QListWidgetItem;
+        item->setSizeHint(bubble->sizeHint());
+        ui->messageList->addItem(item);
+        ui->messageList->setItemWidget(item, bubble);
+    }
+
     ui->messageList->scrollToBottom();
 
-    // 当前活动的消息才会走到这里，追加到内存存储
-    appendToStore(js);
+    // 当前活动的消息才会走到这里，追加到内存存储（使用替换 localpath 后的 JSON）
+    appendToStore(storeJson);
 }
 
 /*
@@ -306,12 +423,12 @@ void ChatWidget::storeMessage(const json &js)
     int targetId = -1;
     bool isGroup = false;
 
-    if (msgid == ONE_CHAT_MSG)
+    if (msgid == ONE_CHAT_MSG || msgid == IMAGE_CHAT_MSG)
     {
         targetId = js["id"].get<int>();  // 发送者 ID 就是聊天对象
         isGroup = false;
     }
-    else if (msgid == GROUP_CHAT_MSG)
+    else if (msgid == GROUP_CHAT_MSG || msgid == GROUP_IMAGE_CHAT_MSG)
     {
         targetId = js["groupid"].get<int>();
         isGroup = true;
@@ -321,8 +438,20 @@ void ChatWidget::storeMessage(const json &js)
         return;  // 不支持的消息类型，忽略
     }
 
+    // 图片消息：将 Base64 保存到本地 assets，替换为 localpath
+    json storeJs = js;
+    if ((msgid == IMAGE_CHAT_MSG || msgid == GROUP_IMAGE_CHAT_MSG) && js.contains("image"))
+    {
+        string filename = js.contains("filename") ? js["filename"].get<string>() : "image.png";
+        string base64 = js["image"].get<string>();
+        QString localPath = saveImageToAssets(base64, filename, targetId, isGroup);
+        storeJs.erase("image");
+        if (!localPath.isEmpty())
+            storeJs["localpath"] = localPath.toStdString();
+    }
+
     string key = makeChatKey(targetId, isGroup);
-    _messageStore[key].push_back(js);
+    _messageStore[key].push_back(storeJs);
     persistToFile(key);
 
     // 通知 MainWidget → ContactWidget 显示红点
@@ -345,6 +474,14 @@ void ChatWidget::clearCurrentChat()
 
     QString path = storageDir() + "/" + QString::fromStdString(key) + ".json";
     QFile::remove(path);
+
+    // 清理图片 assets 目录
+    QString assetPath = storageDir() + "/assets/" + QString::fromStdString(key);
+    QDir assetDir(assetPath);
+    if (assetDir.exists())
+    {
+        assetDir.removeRecursively();
+    }
 }
 
 // ============================================================================
@@ -383,4 +520,104 @@ void ChatWidget::onSendClicked()
     js["msg"] = message;
     js["time"] = timeStr.toStdString();
     appendToStore(js);
+}
+
+// ============================================================================
+// 发送图片
+// ============================================================================
+
+void ChatWidget::onImageClicked()
+{
+    if (_targetId < 0) return;
+
+    // 1. 打开文件选择对话框，过滤图片格式
+    QStringList supported;
+    supported << "image/png" << "image/jpeg" << "image/webp";
+    QString filter = "图片文件 (*.png *.jpg *.jpeg *.webp)";
+    QString filePath = QFileDialog::getOpenFileName(this, "选择图片", QString(), filter);
+    if (filePath.isEmpty()) return;
+
+    // 2. 验证文件格式
+    QImageReader reader(filePath);
+    QString mimeType;
+    QString fmt = reader.format().toLower();
+    if (fmt == "png")       mimeType = "image/png";
+    else if (fmt == "jpg" || fmt == "jpeg") mimeType = "image/jpeg";
+    else if (fmt == "webp") mimeType = "image/webp";
+    else
+    {
+        QMessageBox::warning(this, "格式不支持", "仅支持 PNG、JPG、WebP 格式的图片。");
+        return;
+    }
+
+    // 3. 验证文件大小（限制 1 MB）
+    QFile file(filePath);
+    qint64 filesize = file.size();
+    const qint64 maxSize = 1 * 1024 * 1024; // 1 MB
+    if (filesize > maxSize)
+    {
+        QMessageBox::warning(this, "图片过大",
+                             QString("图片大小超过限制（最大 1 MB）。\n当前大小: %1 KB")
+                             .arg(filesize / 1024));
+        return;
+    }
+
+    // 4. 读取文件并编码为 Base64
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        QMessageBox::warning(this, "读取失败", "无法读取图片文件。");
+        return;
+    }
+    QByteArray fileData = file.readAll();
+    file.close();
+    string imageBase64 = fileData.toBase64().toStdString();
+
+    // 5. 提取文件名
+    QString fileName = QFileInfo(filePath).fileName();
+
+    // 6. 本地立即显示图片气泡（乐观 UI）
+    QString timeStr = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+
+    // 先保存到本地 assets
+    QString localPath = saveImageToAssets(imageBase64, fileName.toStdString());
+
+    // 显示本地气泡（如果保存失败，仍显示 - 解码内存数据）
+    if (localPath.isEmpty())
+    {
+        // fallback: 直接从原始数据写到临时文件
+        QDir().mkpath(assetsDir());
+        QString tmpPath = assetsDir() + "/tmp_" + fileName;
+        QFile tmpFile(tmpPath);
+        if (tmpFile.open(QIODevice::WriteOnly))
+        {
+            tmpFile.write(fileData);
+            tmpFile.close();
+            localPath = tmpPath;
+        }
+    }
+
+    string localPathStr = localPath.toStdString();
+    auto *bubble = new MessageBubble("", "", timeStr, true, localPath);
+    QListWidgetItem *item = new QListWidgetItem;
+    item->setSizeHint(bubble->sizeHint());
+    ui->messageList->addItem(item);
+    ui->messageList->setItemWidget(item, bubble);
+    ui->messageList->scrollToBottom();
+
+    // 7. 持久化到本地存储（不含 Base64，只存 localpath）
+    json storeJs;
+    storeJs["id"] = _currentUserId;
+    storeJs["msgid"] = _isGroupChat ? GROUP_IMAGE_CHAT_MSG : IMAGE_CHAT_MSG;
+    storeJs["filename"] = fileName.toStdString();
+    storeJs["filesize"] = static_cast<int>(filesize);
+    storeJs["mime"] = mimeType.toStdString();
+    storeJs["localpath"] = localPathStr;
+    storeJs["time"] = timeStr.toStdString();
+    appendToStore(storeJs);
+
+    // 8. 发射信号 → MainWidget 发送到网络
+    if (_isGroupChat)
+        emit sendGroupImage(_targetId, imageBase64, fileName.toStdString(), static_cast<int>(filesize), mimeType.toStdString());
+    else
+        emit sendOneImage(_targetId, imageBase64, fileName.toStdString(), static_cast<int>(filesize), mimeType.toStdString());
 }

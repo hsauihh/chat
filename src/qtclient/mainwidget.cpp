@@ -179,6 +179,8 @@ void MainWidget::setupMainPage()
     // 聊天区发送消息 → 网络发送
     connect(_chatWidget, &ChatWidget::sendOneChat, this, &MainWidget::handleSendOneChat);
     connect(_chatWidget, &ChatWidget::sendGroupChat, this, &MainWidget::handleSendGroupChat);
+    connect(_chatWidget, &ChatWidget::sendOneImage, this, &MainWidget::handleSendOneImage);
+    connect(_chatWidget, &ChatWidget::sendGroupImage, this, &MainWidget::handleSendGroupImage);
 
     // 非当前聊天消息到达 → 联系人列表显示红点
     connect(_chatWidget, &ChatWidget::unreadMessageStored, this,
@@ -301,6 +303,12 @@ void MainWidget::handleMessageReceived(json js)
         handleOneChatMessage(js);
         break;
     case GROUP_CHAT_MSG:
+        handleGroupChatMessage(js);
+        break;
+    case IMAGE_CHAT_MSG:
+        handleOneChatMessage(js);
+        break;
+    case GROUP_IMAGE_CHAT_MSG:
         handleGroupChatMessage(js);
         break;
     default:
@@ -472,6 +480,54 @@ void MainWidget::handleSendGroupChat(int groupId, const string &msg)
     js["name"] = _currentUserName;
     js["groupid"] = groupId;
     js["msg"] = msg;
+    js["time"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString();
+    _client->send(js);
+}
+
+/*
+ * handleSendOneImage — 发送单聊图片
+ *
+ * JSON 格式：
+ *   {"msgid": IMAGE_CHAT_MSG(11), "id":<当前用户ID>, "name":"<用户名>",
+ *    "to":<接收者ID>, "filename":"photo.png", "filesize":123456,
+ *    "mime":"image/png", "image":"<Base64>", "time":"<时间>"}
+ */
+void MainWidget::handleSendOneImage(int toId, const string &imageBase64,
+                                    const string &filename, int filesize, const string &mime)
+{
+    json js;
+    js["msgid"] = IMAGE_CHAT_MSG;
+    js["id"] = _currentUserId;
+    js["name"] = _currentUserName;
+    js["to"] = toId;
+    js["filename"] = filename;
+    js["filesize"] = filesize;
+    js["mime"] = mime;
+    js["image"] = imageBase64;
+    js["time"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString();
+    _client->send(js);
+}
+
+/*
+ * handleSendGroupImage — 发送群聊图片
+ *
+ * JSON 格式：
+ *   {"msgid": GROUP_IMAGE_CHAT_MSG(12), "id":<当前用户ID>, "name":"<用户名>",
+ *    "groupid":<群组ID>, "filename":"photo.png", "filesize":123456,
+ *    "mime":"image/png", "image":"<Base64>", "time":"<时间>"}
+ */
+void MainWidget::handleSendGroupImage(int groupId, const string &imageBase64,
+                                      const string &filename, int filesize, const string &mime)
+{
+    json js;
+    js["msgid"] = GROUP_IMAGE_CHAT_MSG;
+    js["id"] = _currentUserId;
+    js["name"] = _currentUserName;
+    js["groupid"] = groupId;
+    js["filename"] = filename;
+    js["filesize"] = filesize;
+    js["mime"] = mime;
+    js["image"] = imageBase64;
     js["time"] = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString();
     _client->send(js);
 }

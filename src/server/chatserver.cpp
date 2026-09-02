@@ -2,8 +2,10 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include <cstring>
 #include "json.hpp"
 #include "chatservice.hpp"
+#include <muduo/base/Logging.h>
 
 using namespace std;
 using namespace placeholders;
@@ -45,12 +47,28 @@ void ChatServer::onMessage(const TcpConnectionPtr &conn,
                Buffer *buffer,
                Timestamp time)
 {
-    string buf = buffer->retrieveAllAsString();
-    // 数据的反序列化
-    json js = json::parse(buf);
-    // 目的：完全解耦网络模块和业务模块
-    // 通过js["msgid"] 获取=》业务handler=》conn  js  time
-    auto msghandler = ChatService::instance()->getHandler(js["msgid"].get<int>());
-    // 回调消息对应的绑定好的事件处理器来执行相应的业务处理
-    msghandler(conn, js, time);
+    // 按 '\0' 分隔处理粘包/半包，支持大 JSON（如图片 Base64）
+    while (buffer->readableBytes() > 0)
+    {
+        const char *data = buffer->peek();
+        size_t len = buffer->readableBytes();
+
+        const char *end = (const char *)memchr(data, '\0', len);
+        if (end == nullptr) break; // 不完整消息，等下次 onMessage 拼接
+
+        size_t msgLen = end - data;
+        if (msgLen > 0)
+        {
+            try {
+                string msg(data, msgLen);
+                json js = json::parse(msg);
+                auto msghandler = ChatService::instance()->getHandler(js["msgid"].get<int>());
+                msghandler(conn, js, time);
+            } catch (const exception &e) {
+                LOG_ERROR << "JSON parse error: " << e.what();
+            }
+        }
+
+        buffer->retrieve(msgLen + 1); // 移除已处理的消息+分隔符
+    }
 }

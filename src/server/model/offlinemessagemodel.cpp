@@ -7,9 +7,8 @@ using namespace std;
 // 存储
 void OfflineMsgModel::insert(int userid, string msg)
 {
-    // 组装sql语句
-    char sql[1024] = {0};
-    sprintf(sql, "insert into OfflineMessage values(%d, '%s')", userid, msg.c_str());
+    // 使用 string 拼接支持大 JSON（如图片 Base64），避免固定缓冲区溢出
+    string sql = "insert into OfflineMessage values(" + to_string(userid) + ", '" + msg + "')";
 
     MySQL mysql;
     if (mysql.connect())

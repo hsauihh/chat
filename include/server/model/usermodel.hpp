@@ -19,7 +19,7 @@ public:
     void resetState();
 
     // 删除用户信息
-    void deleteUser();
+    void deleteUser(int userid);
 };
 
 #endif

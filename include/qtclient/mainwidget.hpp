@@ -73,6 +73,10 @@ private slots:
     // 聊天相关
     void handleSendOneChat(int toId, const string &msg);
     void handleSendGroupChat(int groupId, const string &msg);
+    void handleSendOneImage(int toId, const string &imageBase64, const string &filename,
+                            int filesize, const string &mime);
+    void handleSendGroupImage(int groupId, const string &imageBase64, const string &filename,
+                              int filesize, const string &mime);
     void handleContactChatRequest(int userId, const QString &name);
     void handleContactGroupChatRequest(int groupId, const QString &name);
 

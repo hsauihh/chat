@@ -68,6 +68,7 @@ private slots:
 
 private:
     QTcpSocket *_socket;
+    QByteArray _buffer;  // 缓冲区：暂存不完整的消息片段
 };
 
 #endif

@@ -107,26 +107,22 @@ void ChatClient::onDisconnected()
 void ChatClient::onReadyRead()
 {
     /*
-     * 读取所有缓冲数据。可能一次收到：
-     *   - 一条完整消息
-     *   - 一条不完整消息（TCP 分包）
-     *   - 多条消息粘在一起
-     *
-     * 按 '\0' 字符分割，解析每条完整的 JSON 消息。
-     * 不完整的消息片段（末尾没有 '\0'）也尝试解析。
+     * 读取所有缓冲数据，追加到 _buffer 尾部。
+     * TCP 是字节流协议，一次 readAll 可能只收到消息的一部分。
+     * 把数据累积到 _buffer 中，按 '\0' 分割出完整消息后再解析。
      */
-    QByteArray data = _socket->readAll();
+    _buffer.append(_socket->readAll());
 
     int start = 0;
-    for (int i = 0; i < data.size(); i++)
+    for (int i = 0; i < _buffer.size(); i++)
     {
-        if (data[i] == '\0')
+        if (_buffer[i] == '\0')
         {
             if (i > start)
             {
                 try
                 {
-                    string msgStr(data.constData() + start, i - start);
+                    string msgStr(_buffer.constData() + start, i - start);
                     json js = json::parse(msgStr);
                     emit messageReceived(js);
                 }
@@ -139,23 +135,12 @@ void ChatClient::onReadyRead()
         }
     }
 
-    // 处理尾部没有 '\0' 的残余数据
-    if (start < data.size())
+    // 保留末尾不完整的消息片段，等下次 onReadyRead 继续累积
+    if (start > 0)
     {
-        try
-        {
-            string msgStr(data.constData() + start, data.size() - start);
-            if (!msgStr.empty())
-            {
-                json js = json::parse(msgStr);
-                emit messageReceived(js);
-            }
-        }
-        catch (const exception &e)
-        {
-            cerr << "json parse error: " << e.what() << endl;
-        }
+        _buffer.remove(0, start);
     }
+    // 如果 start == 0，说明整个 buffer 中都没有 '\0'，全部保留等待后续数据
 }
 
 void ChatClient::onErrorOccurred(QAbstractSocket::SocketError socketError)

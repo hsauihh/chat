@@ -18,6 +18,9 @@ enum EnMsgType
     GROUP_CHAT_MSG, // 群聊天
 
     LOGINOUT_MSG, // 注销消息
+
+    IMAGE_CHAT_MSG = 11,       // 单聊图片消息
+    GROUP_IMAGE_CHAT_MSG = 12, // 群聊图片消息
 };
 
 #endif

@@ -72,11 +72,16 @@ signals:
 
     void sendOneChat(int toId, const string &msg);       // 用户点击发送（一对一）
     void sendGroupChat(int groupId, const string &msg);  // 用户点击发送（群聊）
+    void sendOneImage(int toId, const string &imageBase64, const string &filename,
+                      int filesize, const string &mime); // 发送单聊图片
+    void sendGroupImage(int groupId, const string &imageBase64, const string &filename,
+                        int filesize, const string &mime); // 发送群聊图片
     void unreadMessageStored(int targetId, bool isGroup); // 消息被存入非当前聊天
 
 private slots:
     // 【Qt 概念】private slots: 只能在类内部被调用的槽。常用作按钮点击的内部响应。
     void onSendClicked();  // 发送按钮点击 → 构造 JSON → emit 信号给 MainWidget
+    void onImageClicked(); // 图片按钮点击 → 选图 → Base64 → emit 信号给 MainWidget
 
 private:
     // ---- 消息存储相关方法 ----
@@ -87,6 +92,11 @@ private:
     void persistToFile(const string &key); // 将内存中对应 key 的消息写入磁盘
     void loadFromFile(const string &key);  // 从磁盘读取对应 key 的消息
     QString storageDir() const;          // 获取持久化存储目录路径
+    QString assetsDir() const;           // 获取图片资源目录路径（依赖当前 _targetId）
+    QString assetsDirFor(int targetId, bool isGroup) const; // 获取图片资源目录（不依赖 _targetId）
+    QString saveImageToAssets(const string &imageBase64, const string &filename); // 保存 Base64 图片到 assets（依赖当前 _targetId）
+    QString saveImageToAssets(const string &imageBase64, const string &filename,
+                              int targetId, bool isGroup); // 保存 Base64 图片到 assets（指定聊天对象）
 
     // ---- 成员变量 ----
     Ui::ChatWidget *ui;          // UI 文件自动生成的类（ui_chatwidget.h）

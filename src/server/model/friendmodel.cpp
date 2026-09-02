@@ -20,13 +20,11 @@ void FriendModel::insert(int userid, int friendid)
 }
 
 // 删除好友信息
-void FriendMoodel::remove(int userid, int friendid)
+void FriendModel::remove(int userid, int friendid)
 {
     // 组装sql语句
     char sql[1024] = {0};
-    sprintf(sql, "DELETE FROM Friend 
-WHERE (userid = %d AND friendid = %d)
-   OR (userid = %d AND friendid = %d);", userid, friendid, friendid, userid);
+    sprintf(sql, "DELETE FROM Friend WHERE (userid = %d AND friendid = %d) OR (userid = %d AND friendid = %d);", userid, friendid, friendid, userid);
 
     MySQL mysql;
     if (mysql.connect())

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QString>
+#include <QLabel>
 
 namespace Ui {
     class MessageBubble;
@@ -41,18 +42,21 @@ class MessageBubble : public QWidget
     Q_OBJECT
 public:
     // senderName: 发送者名称（自己的消息传空字符串）
-    // message:    消息文本内容
+    // message:    消息文本内容（图片消息传空字符串）
     // timeStr:    时间字符串（格式: "yyyy-MM-dd HH:mm:ss"）
     // isSelf:     true=自己发送（绿色靠右），false=对方发送（白色靠左）
+    // imagePath:  图片本地路径（非空时表示为图片消息）
     explicit MessageBubble(const QString &senderName,
                            const QString &message,
                            const QString &timeStr,
                            bool isSelf,
+                           const QString &imagePath = QString(),
                            QWidget *parent = nullptr);
     ~MessageBubble();
 
 private:
     Ui::MessageBubble *ui;
+    QLabel *_imageLabel = nullptr;
 };
 
 #endif

@@ -19,19 +19,50 @@
 #include "messagebubble.hpp"
 #include "ui_messagebubble.h"
 #include <QLabel>
+#include <QPixmap>
 
 MessageBubble::MessageBubble(const QString &senderName,
                              const QString &message,
                              const QString &timeStr,
                              bool isSelf,
+                             const QString &imagePath,
                              QWidget *parent)
     : QWidget(parent), ui(new Ui::MessageBubble)
 {
     ui->setupUi(this);
 
-    // 设置时间和消息文本
+    // 设置时间
     ui->timeLabel->setText(timeStr);
-    ui->bubbleLabel->setText(message);
+
+    if (!imagePath.isEmpty())
+    {
+        // ---- 图片消息 ----
+        QPixmap pixmap(imagePath);
+        if (!pixmap.isNull())
+        {
+            int maxWidth = 280;
+            QPixmap scaled = pixmap.scaled(maxWidth, 400, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            _imageLabel = new QLabel(this);
+            _imageLabel->setPixmap(scaled);
+            _imageLabel->setStyleSheet("border-radius: 8px;");
+            _imageLabel->setFixedSize(scaled.size());
+
+            // 替换 bubbleLabel 在布局中的位置
+            QHBoxLayout *bubbleLayout = ui->bubbleLayout;
+            int idx = bubbleLayout->indexOf(ui->bubbleLabel);
+            bubbleLayout->insertWidget(idx, _imageLabel);
+            ui->bubbleLabel->hide();
+        }
+        else
+        {
+            ui->bubbleLabel->setText("[图片加载失败]");
+        }
+    }
+    else
+    {
+        // ---- 文本消息 ----
+        ui->bubbleLabel->setText(message);
+    }
 
     if (isSelf)
     {
